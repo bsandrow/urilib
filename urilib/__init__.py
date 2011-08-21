@@ -1,8 +1,8 @@
 import re
 
-scheme_re   = re.compile(r'\w[\w0-9+\-.]*', re.IGNORECASE | re.UNICODE)
-fragment_re = re.compile(r'''([\w\d\-._~!$&'()*+,;=/?:@]|%[a-z0-9]{2})*''', re.IGNORECASE | re.UNICODE)
-query_re    = re.compile(r'''([\w\d\-._~!$&'()*+,;=/?:@]|%[a-z0-9]{2})*''', re.IGNORECASE | re.UNICODE)
+uri_scheme_re = r'[^\W_0-9]([^\W_]|[+\-.])*'
+fragment_re   = re.compile(r'''([\w\d\-._~!$&'()*+,;=/?:@]|%[a-z0-9]{2})*''', re.IGNORECASE | re.UNICODE)
+query_re      = re.compile(r'''([\w\d\-._~!$&'()*+,;=/?:@]|%[a-z0-9]{2})*''', re.IGNORECASE | re.UNICODE)
 
 class URI(object):
 
@@ -16,7 +16,8 @@ class URI(object):
         Verify that the scheme meets the following spec (from RFC 3986):
             scheme      = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
         '''
-        return scheme_re.match(scheme) is not None
+        valid_scheme_re = re.compile(r'^%s$' % uri_scheme_re, re.I | re.U)
+        return valid_scheme_re.match(scheme) is not None
 
     @classmethod
     def is_valid_fragment(cls, fragment):
@@ -67,22 +68,18 @@ class URI(object):
         else:
             self.scheme = scheme
 
-        if buffer.startswith('//'):
-            # extract the authority part
+        # if buffer.startswith('//'):
+        #     # extract the authority part
 
-        parts = buffer.split('?', 1)
-        if len(parts)> 1 and URI.is_valid_query(parts[1]):
-            pass
+        # parts = buffer.split('?', 1)
+        # if len(parts)> 1 and URI.is_valid_query(parts[1]):
+        #     pass
 
-        # deal with the path part
+        # # deal with the path part
 
-        parts = buffer.split('#', 1)
-        if len(parts) > 1 and URI.is_valid_fragment(parts[1]):
-            (self.fragment, buffer) = parts
-
-
-
-
+        # parts = buffer.split('#', 1)
+        # if len(parts) > 1 and URI.is_valid_fragment(parts[1]):
+        #     (self.fragment, buffer) = parts
 
     def __str__(self):
         ''' Return the full URI '''
