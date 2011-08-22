@@ -1,40 +1,34 @@
 import unittest
 import urilib
 
-class TestURI(unittest.TestCase):
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
+class TestStandalones(unittest.TestCase):
     def testIsValidFragment(self):
         ''' Testing URI.is_valid_fragment()
         returns a boolean verifying that the string passed in is valid as the
         fragment part of the URI '''
 
-        assert urilib.URI.is_valid_fragment('#abc') == False,\
+        assert urilib.is_valid_fragment('#abc') == False,\
             'Asserting that a preceeding # is invalid'
 
-        assert urilib.URI.is_valid_fragment('abc#') == False,\
+        assert urilib.is_valid_fragment('abc#') == False,\
             'Asserting that a trailing # is invalid'
 
-        assert urilib.URI.is_valid_fragment('ab#c') == False,\
+        assert urilib.is_valid_fragment('ab#c') == False,\
             'Asserting that a # in the middle is invalid'
 
-        assert urilib.URI.is_valid_fragment('abcdefg') == True,\
+        assert urilib.is_valid_fragment('abcdefg') == True,\
             'Asserting the base case of alphabet chars'
 
-        assert urilib.URI.is_valid_fragment("a.a_a~a!a$a&a'a(a)a*a+a,a;a=a/a?a:a@a") == True,\
+        assert urilib.is_valid_fragment("a.a_a~a!a$a&a'a(a)a*a+a,a;a=a/a?a:a@a") == True,\
             'Asserting that \'._~!$&\'()*+,;=/?:@\' are valid characters'
 
-        assert urilib.URI.is_valid_fragment('%AF%20') == True,\
+        assert urilib.is_valid_fragment('%AF%20') == True,\
             'Asserting that uri-escaped characters are valid.'
 
-        assert urilib.URI.is_valid_fragment("a_a'%AFa(a)a*a+a,a;%AF=a/aa") == True,\
+        assert urilib.is_valid_fragment("a_a'%AFa(a)a*a+a,a;%AF=a/aa") == True,\
             'Asserting that uri-escaped characters are valid mixed with other chars.'
 
-        assert urilib.URI.is_valid_fragment('%%') == False,\
+        assert urilib.is_valid_fragment('%%') == False,\
             'Asserting that escaped % is invalid.'
 
     def testIsValidScheme(self):
@@ -42,28 +36,29 @@ class TestURI(unittest.TestCase):
         returns a boolean verifying that the string passed in is valid as the
         scheme part of the URI '''
 
-        assert urilib.URI.is_valid_scheme('http')  == True
+        assert urilib.is_valid_scheme('http')  == True
 
-        assert urilib.URI.is_valid_scheme('ftp1')  == True
-        assert urilib.URI.is_valid_scheme('f1tp')  == True
-        assert urilib.URI.is_valid_scheme('ftp2')  == True
-        assert urilib.URI.is_valid_scheme('0http') == False
-        assert urilib.URI.is_valid_scheme('f9tp')  == True
+        assert urilib.is_valid_scheme('ftp1')  == True
+        assert urilib.is_valid_scheme('f1tp')  == True
+        assert urilib.is_valid_scheme('ftp2')  == True
+        assert urilib.is_valid_scheme('0http') == False
+        assert urilib.is_valid_scheme('f9tp')  == True
 
-        assert urilib.URI.is_valid_scheme('http.') == True
-        assert urilib.URI.is_valid_scheme('http+') == True
-        assert urilib.URI.is_valid_scheme('http-') == True
+        assert urilib.is_valid_scheme('http.') == True
+        assert urilib.is_valid_scheme('http+') == True
+        assert urilib.is_valid_scheme('http-') == True
 
-        assert urilib.URI.is_valid_scheme('ht.tp') == True
-        assert urilib.URI.is_valid_scheme('ht+tp') == True
-        assert urilib.URI.is_valid_scheme('ht-tp') == True
+        assert urilib.is_valid_scheme('ht.tp') == True
+        assert urilib.is_valid_scheme('ht+tp') == True
+        assert urilib.is_valid_scheme('ht-tp') == True
 
-        assert urilib.URI.is_valid_scheme('.http') == False
-        assert urilib.URI.is_valid_scheme('-http') == False
-        assert urilib.URI.is_valid_scheme('+http') == False
+        assert urilib.is_valid_scheme('.http') == False
+        assert urilib.is_valid_scheme('-http') == False
+        assert urilib.is_valid_scheme('+http') == False
 
-        assert urilib.URI.is_valid_scheme('htt_p') == False
+        assert urilib.is_valid_scheme('htt_p') == False
 
+class TestURI(unittest.TestCase):
     def testURIBaseCase(self):
         ''' Test a base case URI that has most of the parts in it '''
         uri = urilib.URI('http://www.example.com/?q=test#header1')

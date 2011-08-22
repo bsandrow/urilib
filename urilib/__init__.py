@@ -5,6 +5,41 @@ uri_fragment_re = r"([\w\d\-._~!$&'()*+,;=/?:@]|%[a-z0-9]{2})*"
 uri_query_re    = r"([\w\d\-._~!$&'()*+,;=/?:@]|%[a-z0-9]{2})*"
 uri_userinfo_re = r"([\w\-._~]|%[a-z0-9]{2}|%{2}|[!$&'()*+,;=]|:)*" # unreserved | pct-encoded | sub-delmins | :
 
+def is_valid_scheme(scheme):
+    '''
+    Verify that the scheme meets the following spec (from RFC 3986):
+        scheme      = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
+    '''
+    valid_scheme_re = re.compile(r'^%s$' % uri_scheme_re, re.I | re.U)
+    return valid_scheme_re.match(scheme) is not None
+
+def is_valid_fragment(fragment):
+    '''
+    Verify that the fragment meets the following spec (from RFC 3986):
+        fragment      = *( pchar / "/" / "?" )
+        pchar         = unreserved / pct-encoded / sub-delims / ":" / "@"
+        pct-encoded   = "%" HEXDIG HEXDIG
+        unreserved    = ALPHA / DIGIT / "-" / "." / "_" / "~"
+        sub-delims    = "!" / "$" / "&" / "'" / "(" / ")"
+                      / "*" / "+" / "," / ";" / "="
+    '''
+    valid_fragment_re = re.compile(r'^%s$' % uri_fragment_re, re.I | re.U)
+    return valid_fragment_re.match(fragment) is not None
+
+def is_valid_query(query):
+    valid_query_re = re.compile(r'^%s$' % uri_query_re, re.I | re.U)
+    return valid_query_re.match(query) is not None
+
+def is_valid_userinfo(cls, userinfo):
+    ''' Verify that the userinfo meets the spec laid out in RFC 3986:
+        userinfo      = unreserved / pct-encoded / sub-delims / ":"
+        pct-encoded   = "%" HEXDIG HEXDIG
+        unreserved    = ALPHA / DIGIT / "-" / "." / "_" / "~"
+        sub-delims    = "!" / "$" / "&" / "'" / "(" / ")"
+                      / "*" / "+" / "," / ";" / "="
+    '''
+    return re.compile(r'^%s$' % uri_userinfo_re, re.I | re.U).match(userinfo) is not None
+
 class URI(object):
     scheme   = None
     hier_part= None
@@ -16,46 +51,6 @@ class URI(object):
     def __init__(self, uri, scheme=None):
         self.uri = uri
         self._decompose_uri(scheme=scheme)
-
-    @classmethod
-    def is_valid_scheme(cls, scheme):
-        '''
-        Verify that the scheme meets the following spec (from RFC 3986):
-            scheme      = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
-        '''
-        valid_scheme_re = re.compile(r'^%s$' % uri_scheme_re, re.I | re.U)
-        return valid_scheme_re.match(scheme) is not None
-
-    @classmethod
-    def is_valid_fragment(cls, fragment):
-        '''
-        Verify that the fragment meets the following spec (from RFC 3986):
-            fragment      = *( pchar / "/" / "?" )
-            pchar         = unreserved / pct-encoded / sub-delims / ":" / "@"
-            pct-encoded   = "%" HEXDIG HEXDIG
-            unreserved    = ALPHA / DIGIT / "-" / "." / "_" / "~"
-            sub-delims    = "!" / "$" / "&" / "'" / "(" / ")"
-                          / "*" / "+" / "," / ";" / "="
-        '''
-        valid_fragment_re = re.compile(r'^%s$' % uri_fragment_re, re.I | re.U)
-        return valid_fragment_re.match(fragment) is not None
-
-    @classmethod
-    def is_valid_query(cls, query):
-        valid_query_re = re.compile(r'^%s$' % uri_query_re, re.I | re.U)
-        return valid_query_re.match(query) is not None
-
-    @classmethod
-    def is_valid_userinfo(cls, userinfo):
-        ''' Verify that the userinfo meets the spec laid out in RFC 3986:
-            userinfo      = unreserved / pct-encoded / sub-delims / ":"
-            pct-encoded   = "%" HEXDIG HEXDIG
-            unreserved    = ALPHA / DIGIT / "-" / "." / "_" / "~"
-            sub-delims    = "!" / "$" / "&" / "'" / "(" / ")"
-                          / "*" / "+" / "," / ";" / "="
-        '''
-        return re.compile(r'^%s$' % uri_userinfo_re, re.I | re.U).match(userinfo) is not None
-
 
     def _decompose_uri(self, scheme=None):
         ''' Decompose the URI into it's component parts according to RFC 3986:
@@ -84,18 +79,18 @@ class URI(object):
         buffer = self.uri
         if scheme is None:
             parts = buffer.split(u':', 1)
-            if len(parts) > 1 and URI.is_valid_scheme(parts[0]):
+            if len(parts) > 1 and is_valid_scheme(parts[0]):
                 (self.scheme, buffer) = parts
         else:
             self.scheme = scheme
 
         parts = buffer.split('#', 1)
-        if len(parts) > 1 and URI.is_valid_fragment(parts[1]):
+        if len(parts) > 1 and is_valid_fragment(parts[1]):
             self.fragment = parts[1]
             buffer        = parts[0]
 
         parts = buffer.split('?', 1)
-        if len(parts) > 1 and URI.is_valid_query(parts[1]):
+        if len(parts) > 1 and is_valid_query(parts[1]):
             self.query  = parts[1]
             buffer      = parts[0]
 
