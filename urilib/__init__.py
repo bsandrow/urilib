@@ -30,7 +30,7 @@ def is_valid_query(query):
     valid_query_re = re.compile(r'^%s$' % uri_query_re, re.I | re.U)
     return valid_query_re.match(query) is not None
 
-def is_valid_userinfo(cls, userinfo):
+def is_valid_userinfo(userinfo):
     ''' Verify that the userinfo meets the spec laid out in RFC 3986:
         userinfo      = unreserved / pct-encoded / sub-delims / ":"
         pct-encoded   = "%" HEXDIG HEXDIG
