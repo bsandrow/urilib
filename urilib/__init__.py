@@ -1,10 +1,17 @@
 import re
 
-uri_scheme_re = r'[^\W_0-9]([^\W_]|[+\-.])*'
-fragment_re   = re.compile(r'''([\w\d\-._~!$&'()*+,;=/?:@]|%[a-z0-9]{2})*''', re.IGNORECASE | re.UNICODE)
-query_re      = re.compile(r'''([\w\d\-._~!$&'()*+,;=/?:@]|%[a-z0-9]{2})*''', re.IGNORECASE | re.UNICODE)
+uri_scheme_re   = r'[^\W_0-9]([^\W_]|[+\-.])*'
+uri_fragment_re = r"([\w\d\-._~!$&'()*+,;=/?:@]|%[a-z0-9]{2})*"
+uri_query_re    = r"([\w\d\-._~!$&'()*+,;=/?:@]|%[a-z0-9]{2})*"
+uri_userinfo_re = r"([\w\-._~]|%[a-z0-9]{2}|%{2}|[!$&'()*+,;=]|:)*" # unreserved | pct-encoded | sub-delmins | :
 
 class URI(object):
+    scheme   = None
+    hier_part= None
+    query    = None
+    fragment = None
+    path     = None
+    authority= None
 
     def __init__(self, uri, scheme=None):
         self.uri = uri
@@ -30,11 +37,25 @@ class URI(object):
             sub-delims    = "!" / "$" / "&" / "'" / "(" / ")"
                           / "*" / "+" / "," / ";" / "="
         '''
-        return fragment_re.match(fragment) is not None
+        valid_fragment_re = re.compile(r'^%s$' % uri_fragment_re, re.I | re.U)
+        return valid_fragment_re.match(fragment) is not None
 
     @classmethod
     def is_valid_query(cls, query):
-        return query_re.match(query) is not None
+        valid_query_re = re.compile(r'^%s$' % uri_query_re, re.I | re.U)
+        return valid_query_re.match(query) is not None
+
+    @classmethod
+    def is_valid_userinfo(cls, userinfo):
+        ''' Verify that the userinfo meets the spec laid out in RFC 3986:
+            userinfo      = unreserved / pct-encoded / sub-delims / ":"
+            pct-encoded   = "%" HEXDIG HEXDIG
+            unreserved    = ALPHA / DIGIT / "-" / "." / "_" / "~"
+            sub-delims    = "!" / "$" / "&" / "'" / "(" / ")"
+                          / "*" / "+" / "," / ";" / "="
+        '''
+        return re.compile(r'^%s$' % uri_userinfo_re, re.I | re.U).match(userinfo) is not None
+
 
     def _decompose_uri(self, scheme=None):
         ''' Decompose the URI into it's component parts according to RFC 3986:
@@ -68,18 +89,26 @@ class URI(object):
         else:
             self.scheme = scheme
 
-        # if buffer.startswith('//'):
-        #     # extract the authority part
+        parts = buffer.split('#', 1)
+        if len(parts) > 1 and URI.is_valid_fragment(parts[1]):
+            self.fragment = parts[1]
+            buffer        = parts[0]
 
-        # parts = buffer.split('?', 1)
-        # if len(parts)> 1 and URI.is_valid_query(parts[1]):
-        #     pass
+        parts = buffer.split('?', 1)
+        if len(parts) > 1 and URI.is_valid_query(parts[1]):
+            self.query  = parts[1]
+            buffer      = parts[0]
 
-        # # deal with the path part
+        self.hier_part = buffer
 
-        # parts = buffer.split('#', 1)
-        # if len(parts) > 1 and URI.is_valid_fragment(parts[1]):
-        #     (self.fragment, buffer) = parts
+        if buffer.startswith('//'):
+            buffer = buffer[2:]
+            parts = buffer.split('/', 1)
+            self.authority = parts[0]
+            if len(parts) > 1:
+                self.path = '/' + parts[1]
+        else:
+            self.path = buffer
 
     def __str__(self):
         ''' Return the full URI '''
