@@ -92,7 +92,18 @@ class URI(object):
 
     def __str__(self):
         ''' Return the full URI '''
-        return self.scheme + ':' + self.scheme_specific_part
+        str = ''
+        if self.scheme is not None:
+            str += '%s:' % self.scheme
+        if self.authority is not None:
+            str += '//%s' % self.authority
+        if self.path is not None:
+            str += self.path
+        if self.query is not None:
+            str += '?%s' % self.query
+        if self.fragment is not None:
+            str += '#%s' % self.fragment
+        return str
 
 URI._parse = URI._parse_regex
 

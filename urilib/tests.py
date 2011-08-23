@@ -58,7 +58,7 @@ class TestStandalones(unittest.TestCase):
 
         assert urilib.is_valid_scheme('htt_p') == False
 
-class TestURI(unittest.TestCase):
+class TestURIParsing(unittest.TestCase):
     def testURIBaseCase(self):
         ''' Test a base case URI that has most of the parts in it '''
         uri = urilib.URI('http://www.example.com/?q=test#header1')
@@ -68,6 +68,7 @@ class TestURI(unittest.TestCase):
         assert uri.hier_part == '//www.example.com/'
         assert uri.path == '/'
         assert uri.authority == 'www.example.com'
+        assert str(uri)      == 'http://www.example.com/?q=test#header1'
 
     def testURIWithFullyLoadedAuthority(self):
         ''' Test a URI with a fully-loaded authority section '''
@@ -78,6 +79,7 @@ class TestURI(unittest.TestCase):
         assert uri.hier_part == '//username:password@www.example.com:80/admin'
         assert uri.path      == '/admin'
         assert uri.authority == 'username:password@www.example.com:80'
+        assert str(uri)      == 'http://username:password@www.example.com:80/admin'
 
     def testURIBlankAuthorityFileScheme(self):
         ''' Parsing a file URI with an empty authority section '''
@@ -88,6 +90,7 @@ class TestURI(unittest.TestCase):
         assert uri.hier_part == '///my/relative/file/uri'
         assert uri.path      == '/my/relative/file/uri'
         assert uri.authority == ''
+        assert str(uri)      == 'file:///my/relative/file/uri'
 
     def testURINoAuthorityFileScheme(self):
         ''' Test parsing a file URI with no authority section '''
@@ -98,6 +101,7 @@ class TestURI(unittest.TestCase):
         assert uri.hier_part == 'my/relative/file/uri'
         assert uri.path      == 'my/relative/file/uri'
         assert uri.authority is None
+        assert str(uri)      == 'file:my/relative/file/uri'
 
     def testURIOnlyPathAndScheme(self):
         ''' Test a uri that only has a path and scheme '''
@@ -108,6 +112,7 @@ class TestURI(unittest.TestCase):
         assert uri.hier_part == 'example:animal:ferret:nose'
         assert uri.path      == 'example:animal:ferret:nose'
         assert uri.authority is None
+        assert str(uri)      == 'urn:example:animal:ferret:nose'
 
     def testURINoauthrityLoaded(self):
         ''' Test a URI with no authority section but otherwise fully loaded '''
@@ -118,3 +123,4 @@ class TestURI(unittest.TestCase):
         assert uri.hier_part == 'example:animal:ferret:nose'
         assert uri.path      == 'example:animal:ferret:nose'
         assert uri.authority is None
+        assert str(uri)      == 'urn:example:animal:ferret:nose?sources=true#10'
