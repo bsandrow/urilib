@@ -48,11 +48,24 @@ class URI(object):
     path     = None
     authority= None
 
-    def __init__(self, uri, scheme=None):
+    def __init__(self, uri):
         self.uri = uri
-        self._decompose_uri(scheme=scheme)
+        self._parse()
 
-    def _decompose_uri(self, scheme=None):
+    def _parse_regex(self):
+        ''' Simple URI parser using a regex from the appendix of RFC 3986 '''
+        uri_regex_str = r'^(([^:/?#]+):)?((//([^/?#]*))?([^?#]*))?(\?([^#]*))?(#(.*))?'
+        uri_regex     = re.compile(uri_regex_str)
+        match         = uri_regex.match(self.uri)
+        if match is not None:
+            self.scheme    = match.group(2)
+            self.hier_part = match.group(3)
+            self.authority = match.group(5)
+            self.path      = match.group(6)
+            self.query     = match.group(8)
+            self.fragment  = match.group(10)
+
+    def _parse_lexer(self):
         ''' Decompose the URI into it's component parts according to RFC 3986:
                 URI           = scheme ":" hier-part [ "?" query ] [ "#" fragment ]
                 hier-part     = "//" authority path-abempty
@@ -76,38 +89,12 @@ class URI(object):
 
                 pchar         = unreserved / pct-encoded / sub-delims / ":" / "@"
         '''
-        buffer = self.uri
-        if scheme is None:
-            parts = buffer.split(u':', 1)
-            if len(parts) > 1 and is_valid_scheme(parts[0]):
-                (self.scheme, buffer) = parts
-        else:
-            self.scheme = scheme
-
-        parts = buffer.split('#', 1)
-        if len(parts) > 1 and is_valid_fragment(parts[1]):
-            self.fragment = parts[1]
-            buffer        = parts[0]
-
-        parts = buffer.split('?', 1)
-        if len(parts) > 1 and is_valid_query(parts[1]):
-            self.query  = parts[1]
-            buffer      = parts[0]
-
-        self.hier_part = buffer
-
-        if buffer.startswith('//'):
-            buffer = buffer[2:]
-            parts = buffer.split('/', 1)
-            self.authority = parts[0]
-            if len(parts) > 1:
-                self.path = '/' + parts[1]
-        else:
-            self.path = buffer
 
     def __str__(self):
         ''' Return the full URI '''
         return self.scheme + ':' + self.scheme_specific_part
+
+URI._parse = URI._parse_regex
 
 class URIParseError(Exception):
     ''' An exception during processing of a URI '''
