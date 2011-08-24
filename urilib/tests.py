@@ -1,6 +1,15 @@
 import unittest
 import urilib
 
+def assert_dicts_eq(d1,d2):
+    assert type(d1) == dict, 'First argument is not a dict()'
+    assert type(d2) == dict, 'Second argument is not a dict()'
+    assert len(d1.keys()) == len(d2.keys()),\
+            'Got %d keys. Expected %d keys.' % (len(d1.keys()), len(d2.keys()))
+    for k,v in d1.iteritems():
+        assert k in d2, 'Got unexpected key %s' % k
+        assert d1[k] == d2[k], "'%s' != '%s'" % (d1[k], d2[k])
+
 class TestStandalones(unittest.TestCase):
     def testIsValidFragment(self):
         ''' Testing URI.is_valid_fragment()
@@ -58,7 +67,47 @@ class TestStandalones(unittest.TestCase):
 
         assert urilib.is_valid_scheme('htt_p') == False
 
-class TestURIParsing(unittest.TestCase):
+class URLQueryFunctions(unittest.TestCase):
+    def testBaseCase(self):
+        ''' Test a base case of URL query splitting. '''
+        url = urilib.URL('http://www.example.com/?a=b&c=d&e=f&g=h')
+        assert_dicts_eq(
+            url.get_query_as_dict(),
+            { 'a': 'b', 'c': 'd', 'e': 'f', 'g': 'h' },
+        )
+
+    def testChangingDelimiter(self):
+        ''' Test using ; as the delimiter '''
+        url = urilib.URL('http://www.example.com/?a=b&c=d&e=f&g=h')
+        query = url.get_query_as_dict()
+        url.query_separator = ';'
+        url.set_query_from_dict(query)
+        assert url.query == 'a=b;c=d;e=f;g=h'
+
+        url = urilib.URL('http://www.example.com/?a=b;c=d;e=f;g=h')
+        url.query_separator = ';'
+        assert_dicts_eq(
+            url.get_query_as_dict(),
+            { 'a': 'b', 'c': 'd', 'e': 'f', 'g': 'h' },
+        )
+
+    def testAddingAParam(self):
+        ''' Test adding a parameter to the query '''
+        url = urilib.URL('http://www.example.com/?a=b&c=d&e=f&g=h')
+        query = url.get_query_as_dict()
+        query['newparam'] = 'value'
+        url.set_query_from_dict(query)
+        assert url.query == 'a=b&c=d&e=f&newparam=value&g=h'
+
+    def testRemovingAParam(self):
+        ''' Test adding a parameter to the query '''
+        url = urilib.URL('http://www.example.com/?a=b&c=d&e=f&g=h')
+        query = url.get_query_as_dict()
+        del query['e']
+        url.set_query_from_dict(query)
+        assert url.query == 'a=b&c=d&g=h'
+
+class URIParsing(unittest.TestCase):
     def testURIBaseCase(self):
         ''' Test a base case URI that has most of the parts in it '''
         uri = urilib.URI('http://www.example.com/?q=test#header1')

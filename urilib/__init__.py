@@ -107,5 +107,19 @@ class URI(object):
 
 URI._parse = URI._parse_regex
 
+class URL(URI):
+    query_separator = '&'
+
+    def get_query_as_dict(self):
+        return dict(
+            kvpair.split('=')
+                for kvpair in self.query.split(self.query_separator)
+        )
+
+    def set_query_from_dict(self, d):
+        self.query = self.query_separator.join(
+            [ '%s=%s' % (k,v) for k,v in d.iteritems() ]
+        )
+
 class URIParseError(Exception):
     ''' An exception during processing of a URI '''
