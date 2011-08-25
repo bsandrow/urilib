@@ -107,6 +107,46 @@ class URI(object):
 
 URI._parse = URI._parse_regex
 
+class URIQuery(dict):
+    def __init__(self, query=None, separator='&'):
+        if type(separator) != str:
+            raise ValueError('Expected separator to be a string, got %s' % str(type(separator)))
+        self.separator = separator
+
+        if query is None:
+            dict.__init__(self)
+        elif type(query) is dict:
+            dict.__init__(self, query)
+        else:
+            dict.__init__(self)
+            self.split_query_string(query)
+
+    def __str__(self):
+        self.separator.join([
+            '='.join(param, value)
+                for param,values in self.iteritems()
+                    for value in values
+        ])
+
+    def del_by_name_value(self, name, value, max=None):
+        count = 0
+        for i, v in enumerate(self[name]):
+            if v == value:
+                del self[name][i]
+                count += 1
+                if max is not None and count >= max:
+                    return
+
+    def split_query_string(self, query):
+        for pair in query.split(self.separator):
+            if pair == '':
+                continue
+            k,v = pair.split('=')
+            if k in self:
+                self[k].append(v)
+            else:
+                self[k] = [v]
+
 class URL(URI):
     query_separator = '&'
 

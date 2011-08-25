@@ -1,6 +1,21 @@
 import unittest
 import urilib
 
+def assert_query_eq(q1,q2):
+    assert len(q1.keys()) == len(q2.keys()),\
+            'Expected %d params, Got %d.' % (len(q2.keys()), len(q1.keys()))
+    for k,v in q1.iteritems():
+        assert k in q2, 'Got unexpected param: %s' % k
+        assert_lists_eq(q1[k], q2[k])
+
+def assert_lists_eq(l1, l2, strict=True):
+    if strict:
+        assert type(l1) == list, 'Expected a list for arg 0, got %s.' % str(type(l1))
+        assert type(l2) == list, 'Expected a list for arg 1, got %s.' % str(type(l2))
+    assert len(l1) == len(l2), 'Expected %d elements, Got %d elements' % (len(l2), len(l1))
+    for i, element in enumerate(l1):
+        assert element == l2[i], 'At index %d, Expected \'%s\', Got \'%s\'' % (i, l2[i], element)
+
 def assert_dicts_eq(d1,d2):
     assert type(d1) == dict, 'First argument is not a dict()'
     assert type(d2) == dict, 'Second argument is not a dict()'
@@ -66,6 +81,58 @@ class TestStandalones(unittest.TestCase):
         assert urilib.is_valid_scheme('+http') == False
 
         assert urilib.is_valid_scheme('htt_p') == False
+
+class URIQuery(unittest.TestCase):
+
+    def testAlternateSeparator(self):
+        ''' Test non-default separator '''
+        query = urilib.URIQuery('param=val1;param2=val3;param=val2', separator=';')
+        assert_query_eq(query, {'param': ['val1', 'val2'], 'param2': ['val3'], })
+
+    def testNonStringSeparator(self):
+        ''' Test non-string separator error-handling '''
+        try:
+            urilib.URIQuery(separator=dict())
+        except ValueError as e:
+            assert str(e) == 'Expected separator to be a string, got <type \'dict\'>'
+
+    def testAddingSimpleQueryString(self):
+        ''' Adding a simple query string '''
+        query = urilib.URIQuery('q=a&param=value')
+        assert_query_eq(query, { 'q': ['a'], 'param': ['value'], })
+
+    def testCreatingMultiValuedKey(self):
+        ''' Creating a multi-valued key '''
+        query = urilib.URIQuery('param=val1&param2=val3&param=val2')
+        assert_query_eq(query, {'param': ['val1', 'val2'], 'param2': ['val3'], })
+
+    def testClearingAParam(self):
+        ''' Removing all params for a specific name '''
+        query = urilib.URIQuery('param=val1&param=val2&param2=val3')
+        del query['param']
+        assert_query_eq(query, {'param2': ['val3']})
+
+    def testRemovingMultipleParamsByNameAndValue(self):
+        ''' Removing parameters by name-value '''
+        query = urilib.URIQuery('param=val1&param=val2&param2=val3&param=val4&param=val2')
+        assert_query_eq(query, {'param':['val1', 'val2', 'val4', 'val2'], 'param2':['val3']})
+        query.del_by_name_value('param', 'val2')
+        assert_query_eq(query, {'param':['val1', 'val4'], 'param2':['val3']})
+
+    def testRemovingASingleParamByNameAndValue(self):
+        ''' Removing a specific name-value pair '''
+        query = urilib.URIQuery('param=val1&param=val2&param2=val3&param=val4&param=val2')
+        assert_query_eq(query, {'param':['val1', 'val2', 'val4', 'val2'], 'param2':['val3']})
+        query.del_by_name_value('param', 'val2', max=1)
+        assert_query_eq(query, {'param':['val1', 'val4', 'val2'], 'param2':['val3']})
+
+    def testEmptyQueryString(self):
+        ''' Instantiating an empty query '''
+        query = urilib.URIQuery()
+        assert len(query.keys()) == 0
+
+        query = urilib.URIQuery('')
+        assert len(query.keys()) == 0
 
 class URLQueryFunctions(unittest.TestCase):
     def testBaseCase(self):
