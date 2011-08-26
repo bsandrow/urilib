@@ -10,7 +10,8 @@ class URI(object):
     path     = None
     authority= None
 
-    def __init__(self, uri):
+    def __init__(self, uri, query_separator='&'):
+        self.query_separator = query_separator
         self.uri = uri
         self._parse()
 
@@ -23,7 +24,10 @@ class URI(object):
             self.hier_part = match.group(3)
             self.authority = match.group(5)
             self.path      = match.group(6)
-            self.query     = match.group(8)
+            if match.group(8) is None:
+                self.query = None
+            else:
+                self.query = Query(match.group(8), separator=self.query_separator)
             self.fragment  = match.group(10)
 
     def _parse_lexer(self):
@@ -39,7 +43,7 @@ class URI(object):
         if self.path is not None:
             str += self.path
         if self.query is not None:
-            str += '?%s' % self.query
+            str += '?%s' % self.query.__str__()
         if self.fragment is not None:
             str += '#%s' % self.fragment
         return str
@@ -61,11 +65,13 @@ class Query(dict):
             self.split_query_string(query)
 
     def __str__(self):
-        self.separator.join([
-            '='.join(param, value)
+        pairs = [ 
+            '='.join([param, value])
                 for param,values in self.iteritems()
                     for value in values
-        ])
+        ]
+
+        return self.separator.join(pairs)
 
     def del_by_name_value(self, name, value, max=None):
         count = 0
@@ -87,18 +93,7 @@ class Query(dict):
                 self[k] = [v]
 
 class URL(URI):
-    query_separator = '&'
-
-    def get_query_as_dict(self):
-        return dict(
-            kvpair.split('=')
-                for kvpair in self.query.split(self.query_separator)
-        )
-
-    def set_query_from_dict(self, d):
-        self.query = self.query_separator.join(
-            [ '%s=%s' % (k,v) for k,v in d.iteritems() ]
-        )
+    pass
 
 class URIParseError(Exception):
     ''' An exception during processing of a URI '''

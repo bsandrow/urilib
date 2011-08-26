@@ -136,44 +136,7 @@ class Query(unittest.TestCase):
         assert len(query.keys()) == 0
 
 class URLQueryFunctions(unittest.TestCase):
-    def testBaseCase(self):
-        ''' Test a base case of URL query splitting. '''
-        url = urilib.URL('http://www.example.com/?a=b&c=d&e=f&g=h')
-        assert_dicts_eq(
-            url.get_query_as_dict(),
-            { 'a': 'b', 'c': 'd', 'e': 'f', 'g': 'h' },
-        )
-
-    def testChangingDelimiter(self):
-        ''' Test using ; as the delimiter '''
-        url = urilib.URL('http://www.example.com/?a=b&c=d&e=f&g=h')
-        query = url.get_query_as_dict()
-        url.query_separator = ';'
-        url.set_query_from_dict(query)
-        assert url.query == 'a=b;c=d;e=f;g=h'
-
-        url = urilib.URL('http://www.example.com/?a=b;c=d;e=f;g=h')
-        url.query_separator = ';'
-        assert_dicts_eq(
-            url.get_query_as_dict(),
-            { 'a': 'b', 'c': 'd', 'e': 'f', 'g': 'h' },
-        )
-
-    def testAddingAParam(self):
-        ''' Test adding a parameter to the query '''
-        url = urilib.URL('http://www.example.com/?a=b&c=d&e=f&g=h')
-        query = url.get_query_as_dict()
-        query['newparam'] = 'value'
-        url.set_query_from_dict(query)
-        assert url.query == 'a=b&c=d&e=f&newparam=value&g=h'
-
-    def testRemovingAParam(self):
-        ''' Test adding a parameter to the query '''
-        url = urilib.URL('http://www.example.com/?a=b&c=d&e=f&g=h')
-        query = url.get_query_as_dict()
-        del query['e']
-        url.set_query_from_dict(query)
-        assert url.query == 'a=b&c=d&g=h'
+    pass
 
 class URIParsing(unittest.TestCase):
     def testURIBaseCase(self):
@@ -181,7 +144,7 @@ class URIParsing(unittest.TestCase):
         uri = urilib.URI('http://www.example.com/?q=test#header1')
         assert uri.scheme == 'http'
         assert uri.fragment == 'header1'
-        assert uri.query == 'q=test'
+        assert str(uri.query) == 'q=test'
         assert uri.hier_part == '//www.example.com/'
         assert uri.path == '/'
         assert uri.authority == 'www.example.com'
@@ -236,7 +199,7 @@ class URIParsing(unittest.TestCase):
         uri = urilib.URI('urn:example:animal:ferret:nose?sources=true#10')
         assert uri.scheme    == 'urn'
         assert uri.fragment  == '10'
-        assert uri.query     == 'sources=true'
+        assert str(uri.query)== 'sources=true'
         assert uri.hier_part == 'example:animal:ferret:nose'
         assert uri.path      == 'example:animal:ferret:nose'
         assert uri.authority is None
