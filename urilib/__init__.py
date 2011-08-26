@@ -107,7 +107,7 @@ class URI(object):
 
 URI._parse = URI._parse_regex
 
-class URIQuery(dict):
+class Query(dict):
     def __init__(self, query=None, separator='&'):
         if type(separator) != str:
             raise ValueError('Expected separator to be a string, got %s' % str(type(separator)))
