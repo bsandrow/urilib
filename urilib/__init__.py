@@ -27,29 +27,7 @@ class URI(object):
             self.fragment  = match.group(10)
 
     def _parse_lexer(self):
-        ''' Decompose the URI into it's component parts according to RFC 3986:
-                URI           = scheme ":" hier-part [ "?" query ] [ "#" fragment ]
-                hier-part     = "//" authority path-abempty
-                              / path-absolute
-                              / path-rootless
-                              / path-empty
-                path          = path-abempty    ; begins with "/" or is empty
-                              / path-absolute   ; begins with "/" but not "//"
-                              / path-noscheme   ; begins with a non-colon segment
-                              / path-rootless   ; begins with a segment
-                              / path-empty      ; zero characters
-                path-abempty  = *( "/" segment )
-                path-absolute = "/" [ segment-nz *( "/" segment ) ]
-                path-noscheme = segment-nz-nc *( "/" segment )
-                path-rootless = segment-nz *( "/" segment )
-                path-empty    = 0<pchar>
-                segment       = *pchar
-                segment-nz    = 1*pchar
-                segment-nz-nc = 1*( unreserved / pct-encoded / sub-delims / "@" )
-                              ; non-zero-length segment without any colon ":"
-
-                pchar         = unreserved / pct-encoded / sub-delims / ":" / "@"
-        '''
+        ''' Coming soo to a package near you... '''
 
     def __str__(self):
         ''' Return the full URI '''
