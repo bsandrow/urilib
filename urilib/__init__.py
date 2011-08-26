@@ -1,44 +1,6 @@
 import re
-
-uri_scheme_re   = r'[^\W_0-9]([^\W_]|[+\-.])*'
-uri_fragment_re = r"([\w\d\-._~!$&'()*+,;=/?:@]|%[a-z0-9]{2})*"
-uri_query_re    = r"([\w\d\-._~!$&'()*+,;=/?:@]|%[a-z0-9]{2})*"
-uri_userinfo_re = r"([\w\-._~]|%[a-z0-9]{2}|%{2}|[!$&'()*+,;=]|:)*" # unreserved | pct-encoded | sub-delmins | :
-
-def is_valid_scheme(scheme):
-    '''
-    Verify that the scheme meets the following spec (from RFC 3986):
-        scheme      = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
-    '''
-    valid_scheme_re = re.compile(r'^%s$' % uri_scheme_re, re.I | re.U)
-    return valid_scheme_re.match(scheme) is not None
-
-def is_valid_fragment(fragment):
-    '''
-    Verify that the fragment meets the following spec (from RFC 3986):
-        fragment      = *( pchar / "/" / "?" )
-        pchar         = unreserved / pct-encoded / sub-delims / ":" / "@"
-        pct-encoded   = "%" HEXDIG HEXDIG
-        unreserved    = ALPHA / DIGIT / "-" / "." / "_" / "~"
-        sub-delims    = "!" / "$" / "&" / "'" / "(" / ")"
-                      / "*" / "+" / "," / ";" / "="
-    '''
-    valid_fragment_re = re.compile(r'^%s$' % uri_fragment_re, re.I | re.U)
-    return valid_fragment_re.match(fragment) is not None
-
-def is_valid_query(query):
-    valid_query_re = re.compile(r'^%s$' % uri_query_re, re.I | re.U)
-    return valid_query_re.match(query) is not None
-
-def is_valid_userinfo(userinfo):
-    ''' Verify that the userinfo meets the spec laid out in RFC 3986:
-        userinfo      = unreserved / pct-encoded / sub-delims / ":"
-        pct-encoded   = "%" HEXDIG HEXDIG
-        unreserved    = ALPHA / DIGIT / "-" / "." / "_" / "~"
-        sub-delims    = "!" / "$" / "&" / "'" / "(" / ")"
-                      / "*" / "+" / "," / ";" / "="
-    '''
-    return re.compile(r'^%s$' % uri_userinfo_re, re.I | re.U).match(userinfo) is not None
+import urilib.regex
+import urilib.tools
 
 class URI(object):
     scheme   = None
@@ -54,8 +16,7 @@ class URI(object):
 
     def _parse_regex(self):
         ''' Simple URI parser using a regex from the appendix of RFC 3986 '''
-        uri_regex_str = r'^(([^:/?#]+):)?((//([^/?#]*))?([^?#]*))?(\?([^#]*))?(#(.*))?'
-        uri_regex     = re.compile(uri_regex_str)
+        uri_regex     = re.compile(urilib.regex.simple_uri_regex)
         match         = uri_regex.match(self.uri)
         if match is not None:
             self.scheme    = match.group(2)

@@ -1,3 +1,4 @@
+import re
 import unittest
 import urilib
 
@@ -31,28 +32,28 @@ class TestStandalones(unittest.TestCase):
         returns a boolean verifying that the string passed in is valid as the
         fragment part of the URI '''
 
-        assert urilib.is_valid_fragment('#abc') == False,\
+        assert urilib.tools.is_valid_fragment('#abc') == False,\
             'Asserting that a preceeding # is invalid'
 
-        assert urilib.is_valid_fragment('abc#') == False,\
+        assert urilib.tools.is_valid_fragment('abc#') == False,\
             'Asserting that a trailing # is invalid'
 
-        assert urilib.is_valid_fragment('ab#c') == False,\
+        assert urilib.tools.is_valid_fragment('ab#c') == False,\
             'Asserting that a # in the middle is invalid'
 
-        assert urilib.is_valid_fragment('abcdefg') == True,\
+        assert urilib.tools.is_valid_fragment('abcdefg') == True,\
             'Asserting the base case of alphabet chars'
 
-        assert urilib.is_valid_fragment("a.a_a~a!a$a&a'a(a)a*a+a,a;a=a/a?a:a@a") == True,\
+        assert urilib.tools.is_valid_fragment("a.a_a~a!a$a&a'a(a)a*a+a,a;a=a/a?a:a@a") == True,\
             'Asserting that \'._~!$&\'()*+,;=/?:@\' are valid characters'
 
-        assert urilib.is_valid_fragment('%AF%20') == True,\
+        assert urilib.tools.is_valid_fragment('%AF%20') == True,\
             'Asserting that uri-escaped characters are valid.'
 
-        assert urilib.is_valid_fragment("a_a'%AFa(a)a*a+a,a;%AF=a/aa") == True,\
+        assert urilib.tools.is_valid_fragment("a_a'%AFa(a)a*a+a,a;%AF=a/aa") == True,\
             'Asserting that uri-escaped characters are valid mixed with other chars.'
 
-        assert urilib.is_valid_fragment('%%') == False,\
+        assert urilib.tools.is_valid_fragment('%%') == False,\
             'Asserting that escaped % is invalid.'
 
     def testIsValidScheme(self):
@@ -60,27 +61,27 @@ class TestStandalones(unittest.TestCase):
         returns a boolean verifying that the string passed in is valid as the
         scheme part of the URI '''
 
-        assert urilib.is_valid_scheme('http')  == True
+        assert urilib.tools.is_valid_scheme('http')  == True
 
-        assert urilib.is_valid_scheme('ftp1')  == True
-        assert urilib.is_valid_scheme('f1tp')  == True
-        assert urilib.is_valid_scheme('ftp2')  == True
-        assert urilib.is_valid_scheme('0http') == False
-        assert urilib.is_valid_scheme('f9tp')  == True
+        assert urilib.tools.is_valid_scheme('ftp1')  == True
+        assert urilib.tools.is_valid_scheme('f1tp')  == True
+        assert urilib.tools.is_valid_scheme('ftp2')  == True
+        assert urilib.tools.is_valid_scheme('0http') == False
+        assert urilib.tools.is_valid_scheme('f9tp')  == True
 
-        assert urilib.is_valid_scheme('http.') == True
-        assert urilib.is_valid_scheme('http+') == True
-        assert urilib.is_valid_scheme('http-') == True
+        assert urilib.tools.is_valid_scheme('http.') == True
+        assert urilib.tools.is_valid_scheme('http+') == True
+        assert urilib.tools.is_valid_scheme('http-') == True
 
-        assert urilib.is_valid_scheme('ht.tp') == True
-        assert urilib.is_valid_scheme('ht+tp') == True
-        assert urilib.is_valid_scheme('ht-tp') == True
+        assert urilib.tools.is_valid_scheme('ht.tp') == True
+        assert urilib.tools.is_valid_scheme('ht+tp') == True
+        assert urilib.tools.is_valid_scheme('ht-tp') == True
 
-        assert urilib.is_valid_scheme('.http') == False
-        assert urilib.is_valid_scheme('-http') == False
-        assert urilib.is_valid_scheme('+http') == False
+        assert urilib.tools.is_valid_scheme('.http') == False
+        assert urilib.tools.is_valid_scheme('-http') == False
+        assert urilib.tools.is_valid_scheme('+http') == False
 
-        assert urilib.is_valid_scheme('htt_p') == False
+        assert urilib.tools.is_valid_scheme('htt_p') == False
 
 class Query(unittest.TestCase):
 
