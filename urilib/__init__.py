@@ -10,6 +10,9 @@ class URI(object):
     path     = None
     authority= None
 
+    # Control the default parsing method to use.
+    _parse   = lambda self: self._parse_regex()
+
     def __init__(self, uri, query_separator='&'):
         self.query_separator = query_separator
         self.uri = uri
@@ -24,10 +27,7 @@ class URI(object):
             self.hier_part = match.group(3)
             self.authority = match.group(5)
             self.path      = match.group(6)
-            if match.group(8) is None:
-                self.query = None
-            else:
-                self.query = Query(match.group(8), separator=self.query_separator)
+            self.query     = match.group(8)
             self.fragment  = match.group(10)
 
     def _parse_lexer(self):
@@ -47,8 +47,6 @@ class URI(object):
         if self.fragment is not None:
             str += '#%s' % self.fragment
         return str
-
-URI._parse = URI._parse_regex
 
 class Query(dict):
     ''' A way to handle queries in a dict-like manner. Rather than just using a couple of functions

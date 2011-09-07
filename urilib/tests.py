@@ -144,7 +144,7 @@ class URIParsing(unittest.TestCase):
         uri = urilib.URI('http://www.example.com/?q=test#header1')
         assert uri.scheme == 'http'
         assert uri.fragment == 'header1'
-        assert str(uri.query) == 'q=test'
+        assert uri.query     == 'q=test'
         assert uri.hier_part == '//www.example.com/'
         assert uri.path == '/'
         assert uri.authority == 'www.example.com'
@@ -199,7 +199,7 @@ class URIParsing(unittest.TestCase):
         uri = urilib.URI('urn:example:animal:ferret:nose?sources=true#10')
         assert uri.scheme    == 'urn'
         assert uri.fragment  == '10'
-        assert str(uri.query)== 'sources=true'
+        assert uri.query     == 'sources=true'
         assert uri.hier_part == 'example:animal:ferret:nose'
         assert uri.path      == 'example:animal:ferret:nose'
         assert uri.authority is None
