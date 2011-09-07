@@ -2,7 +2,7 @@ import re
 import unittest
 import urilib
 
-def assert_query_eq(q1,q2):
+def assert_queries_eq(q1,q2):
     assert len(q1.keys()) == len(q2.keys()),\
             'Expected %d params, Got %d.' % (len(q2.keys()), len(q1.keys()))
     for k,v in q1.iteritems():
@@ -88,7 +88,7 @@ class Query(unittest.TestCase):
     def testAlternateSeparator(self):
         ''' Test non-default separator '''
         query = urilib.Query('param=val1;param2=val3;param=val2', separator=';')
-        assert_query_eq(query, {'param': ['val1', 'val2'], 'param2': ['val3'], })
+        assert_queries_eq(query, {'param': ['val1', 'val2'], 'param2': ['val3'], })
 
     def testNonStringSeparator(self):
         ''' Test non-string separator error-handling '''
@@ -100,32 +100,32 @@ class Query(unittest.TestCase):
     def testAddingSimpleQueryString(self):
         ''' Adding a simple query string '''
         query = urilib.Query('q=a&param=value')
-        assert_query_eq(query, { 'q': ['a'], 'param': ['value'], })
+        assert_queries_eq(query, { 'q': ['a'], 'param': ['value'], })
 
     def testCreatingMultiValuedKey(self):
         ''' Creating a multi-valued key '''
         query = urilib.Query('param=val1&param2=val3&param=val2')
-        assert_query_eq(query, {'param': ['val1', 'val2'], 'param2': ['val3'], })
+        assert_queries_eq(query, {'param': ['val1', 'val2'], 'param2': ['val3'], })
 
     def testClearingAParam(self):
         ''' Removing all params for a specific name '''
         query = urilib.Query('param=val1&param=val2&param2=val3')
         del query['param']
-        assert_query_eq(query, {'param2': ['val3']})
+        assert_queries_eq(query, {'param2': ['val3']})
 
     def testRemovingMultipleParamsByNameAndValue(self):
         ''' Removing parameters by name-value '''
         query = urilib.Query('param=val1&param=val2&param2=val3&param=val4&param=val2')
-        assert_query_eq(query, {'param':['val1', 'val2', 'val4', 'val2'], 'param2':['val3']})
+        assert_queries_eq(query, {'param':['val1', 'val2', 'val4', 'val2'], 'param2':['val3']})
         query.del_by_name_value('param', 'val2')
-        assert_query_eq(query, {'param':['val1', 'val4'], 'param2':['val3']})
+        assert_queries_eq(query, {'param':['val1', 'val4'], 'param2':['val3']})
 
     def testRemovingASingleParamByNameAndValue(self):
         ''' Removing a specific name-value pair '''
         query = urilib.Query('param=val1&param=val2&param2=val3&param=val4&param=val2')
-        assert_query_eq(query, {'param':['val1', 'val2', 'val4', 'val2'], 'param2':['val3']})
+        assert_queries_eq(query, {'param':['val1', 'val2', 'val4', 'val2'], 'param2':['val3']})
         query.del_by_name_value('param', 'val2', max=1)
-        assert_query_eq(query, {'param':['val1', 'val4', 'val2'], 'param2':['val3']})
+        assert_queries_eq(query, {'param':['val1', 'val4', 'val2'], 'param2':['val3']})
 
     def testEmptyQueryString(self):
         ''' Instantiating an empty query '''
