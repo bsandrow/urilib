@@ -5,10 +5,7 @@ A Python library for handling URIs and URLs. It is based off of my experience
 with Perl's URI and URI::URL, which I find infinitely more usable than what
 Python currently has to offer.
 
-This is also a response to the fact that there isn't much along the lines of
-processing URIs/URLs in Python, and it took all the way until 2.7 for Python to
-get a function in the standard library for breaking apart a URL into it's
-component parts.
+This is in response to (in my opinion) the lack of good URI processing in Python.
 
 Example
 =======
@@ -24,15 +21,17 @@ Example
 
     url = urilib.URL('http://www.example.com/?q=value')
 
-    query = url.get_query_as_dict()
-    query['test'] = 'val'
-    url.set_query_from_dict(query)
+    query = urilib.Query(url.query)
+
+    # Each value is a list (b/c it's possible to have multiple values for the # same key)
+    query['test'].append('val')
+
+    url.query = str(query)
     assert url.query == 'q=value&test=val'
 
     url = urilib.URL('http://www.example.com/?q=value')
 
-    query = url.get_query_as_dict()
-    url.param_separator = ';'
-    query['test'] = 'val'
-    url.set_query_from_dict(query)
+    query = urilib.Query(url.query, separator=';')
+    query['test'].append('val')
+    url.query = str(query)
     assert url.query == 'q=value;test=val'
