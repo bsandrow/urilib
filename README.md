@@ -35,3 +35,18 @@ Example
     query['test'].append('val')
     url.query = str(query)
     assert url.query == 'q=value;test=val'
+
+Requirements
+============
+
+ * Python 2.3+
+
+Credits
+=======
+
+2011 (c) Brandon Sandrowicz <brandon@sandrowicz.org>
+
+License
+=======
+
+See LICENSE
