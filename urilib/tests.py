@@ -1,6 +1,7 @@
 import re
 import unittest
 import urilib
+import urlparse
 
 def assert_queries_eq(q1,q2):
     assert len(q1.keys()) == len(q2.keys()),\
@@ -45,6 +46,30 @@ class TestBasicProcessing(unittest.TestCase):
         uri.fragment = 'Section-3'
         assert str(uri) == 'ftp://example.com/blog?id=12#Section-3'
 
+class TestCompareAgainstUrlParse(unittest.TestCase):
+
+    def testAgainstUrlParseHttp(self):
+        test_url = 'http://user:password@yahoo.com:8080/path/to/blog/?postid=20#Body'
+        url_parse_result = urlparse.urlparse(test_url)
+        uri_result       = urilib.URI(test_url)
+
+        assert url_parse_result.scheme   == uri_result.scheme
+        assert url_parse_result.netloc   == uri_result.authority
+        assert url_parse_result.path     == uri_result.path
+        assert url_parse_result.query    == uri_result.query
+        assert url_parse_result.fragment == uri_result.fragment
+
+    def testAgainstUrlParseUrn(self):
+        test_urn = 'urn:example:monkey:toes'
+        url_parse_result = urlparse.urlparse(test_urn)
+        uri_result       = urilib.URI(test_urn)
+
+        assert url_parse_result.scheme   == uri_result.scheme
+        assert url_parse_result.netloc   == uri_result.authority
+        assert url_parse_result.path     == uri_result.path
+        assert url_parse_result.query    == uri_result.query
+        assert url_parse_result.fragment == uri_result.fragment
+
 class TestSchemeProcessing(unittest.TestCase):
     """ Test the processing of the URI scheme """
 
@@ -64,7 +89,7 @@ class TestSchemeProcessing(unittest.TestCase):
         assert uri.scheme == 'test.scheme.more'
 
         uri = urilib.URI('-test-scheme://example.com')
-        assert uri.scheme is None
+        assert uri.scheme == ""
 
 class TestHierPartProcessing(unittest.TestCase):
     """ Test that the hier part (authority + path) is processed correctly """

@@ -9,7 +9,17 @@ unreserved  = "[a-zA-Z0-9._~-]"
 scheme_re    = re.compile(r'[^\W0-9_]([^\W_]|[+.-])*')
 hier_part_re = re.compile(r'(%s|%s|%s|/)*' % (sub_delims, pct_encoded, unreserved))
 
+def join_if_exists(join_string, iterable):
+    return join_string.join(item for item in iterable if item)
+
 class URI(object):
+    orig_uri  = ""
+    scheme    = ""
+    hier_part = ""
+    query     = ""
+    fragment  = ""
+    authority = ""
+    path      = ""
 
     def __init__(self, uri):
         self.orig_uri = uri.strip()
@@ -32,8 +42,6 @@ class URI(object):
             if match:
                 self.scheme = scheme
                 uri = rest
-            else:
-                self.scheme = None
 
         # Fragment
         parts = uri.rsplit('#', 1)
@@ -41,8 +49,6 @@ class URI(object):
             rest, fragment = parts
             self.fragment = fragment
             uri = rest
-        else:
-            self.fragment = None
 
         # Hier Part
         parts = uri.split('?', 1)
@@ -50,7 +56,7 @@ class URI(object):
             hier_part, query = parts
         else:
             hier_part = uri
-            query = None
+            query = ""
 
         match = hier_part_re.match(hier_part)
         if match:
@@ -61,22 +67,24 @@ class URI(object):
 
         self.query = query
 
+        self._process_hier_part()
+
+    def _process_hier_part(self):
+        if self.hier_part.startswith('//'):
+            parts = (self.hier_part[2:]).split('/', 1)
+            if len(parts) == 2:
+                self.authority, self.path = parts
+                self.path = '/' + self.path
+            else:
+                self.authority = self.hier_part[2:]
+        else:
+            self.path = self.hier_part
+
     @property
     def uri(self):
-        if self.scheme:
-            uri = "%s:" % self.scheme
-        else:
-            uri = ""
-
-        if self.hier_part:
-            uri += self.hier_part
-
-        if self.query:
-            uri += '?' + self.query
-
-        if self.fragment:
-            uri += '#' + self.fragment
-
+        uri = join_if_exists(':', [self.scheme, self.hier_part])
+        uri = join_if_exists('?', [uri, self.query])
+        uri = join_if_exists('#', [uri, self.fragment])
         return uri
 
     @classmethod
@@ -84,7 +92,8 @@ class URI(object):
         uri = cls(uri)
         return {
             'scheme'  : uri.scheme,
-            'hier'    : uri.hier_part,
+            'netloc'  : uri.authority,
+            'path'    : uri.path,
             'params'  : uri.query,
             'fragment': uri.fragment,
         }
