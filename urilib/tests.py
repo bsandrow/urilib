@@ -27,9 +27,65 @@ def assert_dicts_eq(d1,d2):
         assert d1[k] == d2[k], "'%s' != '%s'" % (d1[k], d2[k])
 
 class TestBasicProcessing(unittest.TestCase):
+    """A few basic tests on operating conditions that don't fit anywhere else"""
+
     def testStripsWhitespace(self):
         uri = urilib.URI('  http://example.com \t')
         assert str(uri) == 'http://example.com'
+
+    def testRepr(self):
+        uri = urilib.URI('http://example.com')
+        assert uri.__repr__() == "<URI('http://example.com')>"
+
+    def testUriReconstruction(self):
+        uri = urilib.URI('http://example.com/blog?id=12#Section-2')
+        assert str(uri) == 'http://example.com/blog?id=12#Section-2'
+
+        uri.scheme   = 'ftp'
+        uri.fragment = 'Section-3'
+        assert str(uri) == 'ftp://example.com/blog?id=12#Section-3'
+
+class TestSchemeProcessing(unittest.TestCase):
+    """ Test the processing of the URI scheme """
+
+    def testSchemeHttp(self):
+        uri = urilib.URI('http://example.com')
+        assert uri.scheme == 'http'
+
+    def testSchemeUrn(self):
+        uri = urilib.URI('urn:isbn:000123134325')
+        assert uri.scheme == 'urn'
+
+    def testSchemeSpecialChars(self):
+        uri = urilib.URI('test-scheme+more://example.com')
+        assert uri.scheme == 'test-scheme+more'
+
+        uri = urilib.URI('test.scheme.more://example.com')
+        assert uri.scheme == 'test.scheme.more'
+
+        uri = urilib.URI('-test-scheme://example.com')
+        assert uri.scheme is None
+
+class TestHierPartProcessing(unittest.TestCase):
+    """ Test that the hier part (authority + path) is processed correctly """
+
+    def testHierPartUrn(self):
+        uri = urilib.URI('urn:isbn:0123456789012')
+        assert uri.hier_part == 'isbn:0123456789012'
+
+    def testHierPartHttp(self):
+        uri = urilib.URI('http://user:password@example.com/blog/')
+        assert uri.hier_part == '//user:password@example.com/blog/'
+
+        uri = urilib.URI('http://user:password@example.com/blog/?key=value')
+        assert uri.hier_part == '//user:password@example.com/blog/'
+
+        uri = urilib.URI('http://user:password@example.com/blog/#section-2.2')
+        assert uri.hier_part == '//user:password@example.com/blog/'
+
+        uri = urilib.URI('http://user:password@example.com/blog/?key=value#section-2.2')
+        assert uri.hier_part == '//user:password@example.com/blog/'
+
 
 # class TestURNProcessing(unittest.TestCase):
 #     pass
