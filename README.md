@@ -1,40 +1,22 @@
 urilib
 ======
 
-A Python library for handling URIs and URLs. It is based off of my experience
-with Perl's URI and URI::URL, which I find infinitely more usable than what
-Python currently has to offer.
+A Python library for handling URIs. Based off of my experience with Perl's URI,
+having a class to wrap URIs allows for quick editting of pieces of the URI
+without the need to write code to decompose/recompose every time.
 
-This is in response to (in my opinion) the lack of good URI processing in Python.
-
-Example
-=======
+Synopsis
+========
 
     import urilib
 
     uri = urilib.URI('http://www.example.com/?q=value')
 
-    assert uri.scheme == 'http'
+    assert uri.scheme    == 'http'
     assert uri.authority == 'www.example.com'
-    assert uri.query == 'q=value'
-    assert uri.fragment == ''
-
-    url = urilib.URL('http://www.example.com/?q=value')
-
-    query = urilib.Query(url.query)
-
-    # Each value is a list (b/c it's possible to have multiple values for the # same key)
-    query['test'].append('val')
-
-    url.query = str(query)
-    assert url.query == 'q=value&test=val'
-
-    url = urilib.URL('http://www.example.com/?q=value')
-
-    query = urilib.Query(url.query, separator=';')
-    query['test'].append('val')
-    url.query = str(query)
-    assert url.query == 'q=value;test=val'
+    assert uri.path      == '/'
+    assert uri.query     == 'q=value'
+    assert uri.fragment  == ''
 
 Requirements
 ============
@@ -44,7 +26,7 @@ Requirements
 Credits
 =======
 
-2011 (c) Brandon Sandrowicz <brandon@sandrowicz.org>
+2012 (c) Brandon Sandrowicz <brandon@sandrowicz.org>
 
 License
 =======
