@@ -23,6 +23,15 @@ Requirements
 
  * Python 2.3+
 
+Bugs
+====
+
+No known bugs, but this hasn't been extensively tested, and there are probably
+unaccounted-for edge cases out there in the wild. If you encounter any, or can
+think of any that were missed, please contact the maintainer:
+
+Brandon Sandrowicz <brandon@sandrowicz.org>
+
 Credits
 =======
 
