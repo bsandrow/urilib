@@ -1,3 +1,15 @@
+#!/usr/bin/env python
+"""A library for building/decomposing URIs
+"""
+
+__author__     = 'Brandon Sandrowicz'
+__version__    = '0.1'
+__copyright__  = 'Copyright 2012, Brandon Sandrowicz'
+__license__    = 'MIT'
+__maintainer__ = 'Brandon Sandrowicz'
+__email__      = 'brandon@sandrowicz.org'
+__status__     = 'Development'
+
 import re
 
 # Character Classes
