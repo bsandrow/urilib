@@ -73,7 +73,6 @@ class URI(object):
         match = hier_part_re.match(hier_part)
         if match:
             self.hier_part = hier_part
-            uri = rest
         else:
             self.hier_part = None
 

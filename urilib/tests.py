@@ -24,6 +24,28 @@ class TestBasicProcessing(unittest.TestCase):
 
 class TestCompareAgainstUrlParse(unittest.TestCase):
 
+    def testAgainstUrlParsePathOnly(self):
+        test_url = "/usr/local/etc/ssh_config"
+        url_parse_result = urlparse.urlparse(test_url)
+        uri_result       = urilib.URI(test_url)
+
+        assert url_parse_result.scheme   == uri_result.scheme
+        assert url_parse_result.netloc   == uri_result.authority
+        assert url_parse_result.path     == uri_result.path
+        assert url_parse_result.query    == uri_result.query
+        assert url_parse_result.fragment == uri_result.fragment
+
+    def testAgainstUrlParseSchemeless(self):
+        test_url = '://example.com/'
+        url_parse_result = urlparse.urlparse(test_url)
+        uri_result       = urilib.URI(test_url)
+
+        assert url_parse_result.scheme   == uri_result.scheme
+        assert url_parse_result.netloc   == uri_result.authority
+        assert url_parse_result.path     == uri_result.path
+        assert url_parse_result.query    == uri_result.query
+        assert url_parse_result.fragment == uri_result.fragment
+
     def testAgainstUrlParseHttp(self):
         test_url = 'http://user:password@yahoo.com:8080/path/to/blog/?postid=20#Body'
         url_parse_result = urlparse.urlparse(test_url)
