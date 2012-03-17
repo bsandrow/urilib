@@ -1,7 +1,11 @@
 import re
 import unittest
 import urilib
-import urlparse
+
+try:
+    from urlparse import urlparse
+except ImportError:
+    from urllib import urlparse
 
 class TestBasicProcessing(unittest.TestCase):
     """A few basic tests on operating conditions that don't fit anywhere else"""
@@ -26,7 +30,7 @@ class TestCompareAgainstUrlParse(unittest.TestCase):
 
     def testAgainstUrlParsePathOnly(self):
         test_url = "/usr/local/etc/ssh_config"
-        url_parse_result = urlparse.urlparse(test_url)
+        url_parse_result = urlparse(test_url)
         uri_result       = urilib.URI(test_url)
 
         assert url_parse_result.scheme   == uri_result.scheme
@@ -37,7 +41,7 @@ class TestCompareAgainstUrlParse(unittest.TestCase):
 
     def testAgainstUrlParseSchemeless(self):
         test_url = '://example.com/'
-        url_parse_result = urlparse.urlparse(test_url)
+        url_parse_result = urlparse(test_url)
         uri_result       = urilib.URI(test_url)
 
         assert url_parse_result.scheme   == uri_result.scheme
@@ -48,7 +52,7 @@ class TestCompareAgainstUrlParse(unittest.TestCase):
 
     def testAgainstUrlParseHttp(self):
         test_url = 'http://user:password@yahoo.com:8080/path/to/blog/?postid=20#Body'
-        url_parse_result = urlparse.urlparse(test_url)
+        url_parse_result = urlparse(test_url)
         uri_result       = urilib.URI(test_url)
 
         assert url_parse_result.scheme   == uri_result.scheme
@@ -59,7 +63,7 @@ class TestCompareAgainstUrlParse(unittest.TestCase):
 
     def testAgainstUrlParseUrn(self):
         test_urn = 'urn:example:monkey:toes'
-        url_parse_result = urlparse.urlparse(test_urn)
+        url_parse_result = urlparse(test_urn)
         uri_result       = urilib.URI(test_urn)
 
         assert url_parse_result.scheme   == uri_result.scheme
