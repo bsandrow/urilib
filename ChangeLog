@@ -1,0 +1,2 @@
+2012-03-18 Brandon Sandrowicz <brandon@sandrowicz.org>
+	* urilib/test.py, urilib/__init.py, ChangeLog, README.md, setup.py: Initial Version

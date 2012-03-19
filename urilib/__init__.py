@@ -1,109 +1,110 @@
+#!/usr/bin/env python
+"""A library for building/decomposing URIs
+"""
+
+__author__     = 'Brandon Sandrowicz'
+__version__    = '0.2'
+__copyright__  = 'Copyright 2012, Brandon Sandrowicz'
+__license__    = 'MIT'
+__maintainer__ = 'Brandon Sandrowicz'
+__email__      = 'brandon@sandrowicz.org'
+__status__     = 'Development'
+
 import re
-import urilib.regex
-import urilib.tools
+
+# Character Classes
+sub_delims  = "[!$&'()*+,;=]"
+pct_encoded = "%[a-fA-F0-9]{2}"
+unreserved  = "[a-zA-Z0-9._~-]"
+
+# Parts
+scheme_re    = re.compile(r'[^\W0-9_]([^\W_]|[+.-])*')
+hier_part_re = re.compile(r'(%s|%s|%s|/)*' % (sub_delims, pct_encoded, unreserved))
+
+def join_if_exists(join_string, iterable):
+    return join_string.join(item for item in iterable if item)
 
 class URI(object):
-    scheme   = None
-    hier_part= None
-    query    = None
-    fragment = None
-    path     = None
-    authority= None
+    orig_uri  = ""
+    scheme    = ""
+    hier_part = ""
+    query     = ""
+    fragment  = ""
+    authority = ""
+    path      = ""
 
-    # Control the default parsing method to use.
-    _parse   = lambda self: self._parse_regex()
-
-    def __init__(self, uri, query_separator='&'):
-        self.query_separator = query_separator
-        self.uri = uri
-        self._parse()
-
-    def _parse_regex(self):
-        ''' Use a simple regex to parse the uri. Borrowed from the appendix of RFC 3986 '''
-        uri_regex     = re.compile(urilib.regex.simple_uri_regex)
-        match         = uri_regex.match(self.uri)
-        if match is not None:
-            self.scheme    = match.group(2)
-            self.hier_part = match.group(3)
-            self.authority = match.group(5)
-            self.path      = match.group(6)
-            self.query     = match.group(8)
-            self.fragment  = match.group(10)
-
-    def _parse_lexer(self):
-        ''' Use a lexer to parse the uri. Coming soon to a parser near you... '''
+    def __init__(self, uri):
+        self.orig_uri = uri.strip()
+        self._process_uri()
 
     def __str__(self):
-        ''' Join the full URI back together an return it. '''
-        str = ''
-        if self.scheme is not None:
-            str += '%s:' % self.scheme
-        if self.authority is not None:
-            str += '//%s' % self.authority
-        if self.path is not None:
-            str += self.path
-        if self.query is not None:
-            str += '?%s' % self.query.__str__()
-        if self.fragment is not None:
-            str += '#%s' % self.fragment
-        return str
+        return self.uri
 
-class Query(dict):
-    ''' A way to handle queries in a dict-like manner. Rather than just using a couple of functions
-    to join/split dicts into query strings, I created a customizable object to deal with them. Since
-    it is sub-classed right off of dict() it should be functionally equivalent. This is especially
-    useful for dealing with the fact that query strings can have multiple values for the same key.
-    This is a use-case that plain dict()'s don't handle well without the additional handling that
-    I've added here. '''
+    def __repr__(self):
+        return "<URI('%s')>" % self.uri
 
-    def __init__(self, query=None, separator='&'):
-        if type(separator) != str:
-            raise ValueError('Expected separator to be a string, got %s' % str(type(separator)))
-        self.separator = separator
+    def _process_uri(self):
+        uri = self.orig_uri
 
-        if query is None:
-            dict.__init__(self)
-        elif type(query) is dict:
-            dict.__init__(self, query)
+        # Scheme
+        parts = uri.split(':', 1)
+        if len(parts) == 2:
+            scheme, rest = parts
+            match = scheme_re.match(scheme)
+            if match:
+                self.scheme = scheme
+                uri = rest
+
+        # Fragment
+        parts = uri.rsplit('#', 1)
+        if len(parts) == 2:
+            rest, fragment = parts
+            self.fragment = fragment
+            uri = rest
+
+        # Hier Part
+        parts = uri.split('?', 1)
+        if len(parts) == 2:
+            hier_part, query = parts
         else:
-            dict.__init__(self)
-            self.split_query_string(query)
+            hier_part = uri
+            query = ""
 
-    def __str__(self):
-        ''' Convert back into a query string. '''
-        pairs = [ 
-            '='.join([param, value])
-                for param,values in self.iteritems()
-                    for value in values
-        ]
+        match = hier_part_re.match(hier_part)
+        if match:
+            self.hier_part = hier_part
+        else:
+            self.hier_part = None
 
-        return self.separator.join(pairs)
+        self.query = query
 
-    def del_by_name_value(self, name, value, max=None):
-        ''' Delete all entries under the param `name` where the value is equal to `value`. The
-        optional `max` parameter controls how many value matches to remove. '''
-        count = 0
-        for i, v in enumerate(self[name]):
-            if v == value:
-                del self[name][i]
-                count += 1
-                if max is not None and count >= max:
-                    return
+        self._process_hier_part()
 
-    def split_query_string(self, query):
-        ''' Set the query string directly. This will append all key-value pairs from the query to
-        the current key-value pairs in the Query's dict. '''
-        for pair in query.split(self.separator):
-            if pair == '':
-                continue
-            k,v = pair.split('=')
-            if k in self:
-                self[k].append(v)
+    def _process_hier_part(self):
+        if self.hier_part.startswith('//'):
+            parts = (self.hier_part[2:]).split('/', 1)
+            if len(parts) == 2:
+                self.authority, self.path = parts
+                self.path = '/' + self.path
             else:
-                self[k] = [v]
+                self.authority = self.hier_part[2:]
+        else:
+            self.path = self.hier_part
 
-class URL(URI):
-    pass
+    @property
+    def uri(self):
+        uri = join_if_exists(':', [self.scheme, self.hier_part])
+        uri = join_if_exists('?', [uri, self.query])
+        uri = join_if_exists('#', [uri, self.fragment])
+        return uri
 
-class URIParseError(Exception):
-    ''' An exception during processing of a URI '''
+    @classmethod
+    def parse_uri(cls, uri):
+        uri = cls(uri)
+        return {
+            'scheme'  : uri.scheme,
+            'netloc'  : uri.authority,
+            'path'    : uri.path,
+            'params'  : uri.query,
+            'fragment': uri.fragment,
+        }
