@@ -11,6 +11,7 @@ __email__      = 'brandon@sandrowicz.org'
 __status__     = 'Development'
 
 import re
+import urllib
 
 # Character Classes
 sub_delims  = "[!$&'()*+,;=]"
@@ -108,3 +109,48 @@ class URI(object):
             'params'  : uri.query,
             'fragment': uri.fragment,
         }
+
+class QueryDict(dict):
+    """A dictionary object for dealing with URI query parameters"""
+
+    def __init__(self, query_string):
+        params         = [ param.split('=') for param in query_string.split('&') ]
+        decoded_params = [ (urllib.unquote(k), urllib.unquote(v)) for k,v in params ]
+        self.update(decoded_params)
+
+    def get_all(self, key):
+        return super(QueryDict, self).__getitem__(key)
+
+    def __getitem__(self, key):
+        """ By default, return the first item
+
+        Since each key can have multiple values, we need a simple interface to
+        the most common use-case (each key only has a single value). We want a
+        structure that will both handle single values without the need to index
+        a list, while allowing for dealing with the one key-multiple values
+        use-case.
+        """
+        return super(QueryDict, self).__getitem__(key)[0]
+
+    def get(self, key, default=None):
+        if key in self:
+            return super(QueryDict, self).get(key)
+        else:
+            return default
+
+    def update(self, *args, **kwargs):
+        if args:
+            if len(args) > 1:
+                raise TypeError("update expected at most 1 arguments, got %d" % len(args))
+
+            for k,v in args[0]:
+                self[k] = v
+
+        for key in kwargs:
+            self[key] = kwargs[key]
+
+    def __setitem__(self, key, value):
+        if super(QueryDict, self).get(key):
+            super(QueryDict, self).get(key).append(value)
+        else:
+            super(QueryDict, self).__setitem__(key, [ value ])
