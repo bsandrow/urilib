@@ -110,33 +110,40 @@ class URI(object):
             'fragment': uri.fragment,
         }
 
-class QueryDict(dict):
+class QueryDict(object):
     """A dictionary object for dealing with URI query parameters"""
 
     def __init__(self, query_string):
-        params         = [ param.split('=') for param in query_string.split('&') ]
-        decoded_params = [ (urllib.unquote(k), urllib.unquote(v)) for k,v in params ]
-        self.update(decoded_params)
+        params      = [ param.split('=') for param in query_string.split('&') ]
+        self.params = [ (urllib.unquote(k), urllib.unquote(v)) for k,v in params ]
 
-    def get_all(self, key):
-        return super(QueryDict, self).__getitem__(key)
+    def __delitem__(self, key):
+        self.params = [ param for param in self.params if param[0] != key ]
 
     def __getitem__(self, key):
-        """ By default, return the first item
+        for param in self.params:
+            if param[0] == key:
+                return param[1]
+        raise KeyError
 
-        Since each key can have multiple values, we need a simple interface to
-        the most common use-case (each key only has a single value). We want a
-        structure that will both handle single values without the need to index
-        a list, while allowing for dealing with the one key-multiple values
-        use-case.
-        """
-        return super(QueryDict, self).__getitem__(key)[0]
+    def __setitem__(self, key, value):
+        self.params.append((key,value))
 
-    def get(self, key, default=None):
-        if key in self:
-            return super(QueryDict, self).get(key)
-        else:
-            return default
+    def keys(self):
+        return self.dict().keys()
+
+    def values(self):
+        return self.dict().values()
+
+    def list(self):
+        return self.params
+
+    def dict(self):
+        d = {}
+        for param in self.params:
+            if param[0] not in d:
+                d[param[0]] = param[1]
+        return d
 
     def update(self, *args, **kwargs):
         if args:
@@ -144,13 +151,16 @@ class QueryDict(dict):
                 raise TypeError("update expected at most 1 arguments, got %d" % len(args))
 
             for k,v in args[0]:
-                self[k] = v
+                self.params.append((k,v))
 
         for key in kwargs:
-            self[key] = kwargs[key]
+            self.params.append((key, kwargs[key]))
 
-    def __setitem__(self, key, value):
-        if super(QueryDict, self).get(key):
-            super(QueryDict, self).get(key).append(value)
-        else:
-            super(QueryDict, self).__setitem__(key, [ value ])
+    def get(self, key, default=None):
+        try:
+            return self.__getitem__(key)
+        except KeyError:
+            return default
+
+    def get_all(self, key):
+        return [ param[1] for param in self.params if param[0] == key ]
