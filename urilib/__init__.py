@@ -114,11 +114,49 @@ class QueryDict(object):
     """A dictionary object for dealing with URI query parameters"""
 
     def __init__(self, query_string):
-        params      = [ param.split('=') for param in query_string.split('&') ]
-        self.params = [ (urllib.unquote(k), urllib.unquote(v)) for k,v in params ]
+        self.params = self._str_to_params(query_string)
+
+    def _str_to_params(self, string):
+        """Convert a query string into a list of tuples"""
+        params      = [ param.split('=') for param in string.split('&') ]
+        return [ (urllib.unquote(k), urllib.unquote(v)) for k,v in params ]
+
+    def _add_params(self, *args, **kwargs):
+        """Internal implementation of append()
+
+        The purpose of abstracting this is to possibly add QueryDict.update()
+        later with the same interface.
+        """
+        if args:
+            if len(args) > 1:
+                raise TypeError("append() expected at most 1 arguments, got %d" % len(args))
+
+            if isinstance(args[0], str):
+                self.params += self._str_to_params(args[0])
+            else:
+                for k,v in args[0]:
+                    self.params.append((k,v))
+
+        for key in kwargs:
+            self.params.append((key, kwargs[key]))
+
+    def append(self, *args, **kwargs):
+        """Take params in various forms of input. Append to param list."""
+        self._add_params(*args, **kwargs)
+
+    def list(self):
+        """Return the params as a list of tuples."""
+        return self.params
 
     def __delitem__(self, key):
+        """When deleteing a key, remove all instances of a key"""
         self.params = [ param for param in self.params if param[0] != key ]
+
+    def __contains__(self, key):
+        for param in self.params:
+            if param[0] == key:
+                return True
+        return False
 
     def __getitem__(self, key):
         for param in self.params:
@@ -126,6 +164,7 @@ class QueryDict(object):
                 return param[1]
         raise KeyError
 
+    # ???
     def __setitem__(self, key, value):
         self.params.append((key,value))
 
@@ -133,10 +172,7 @@ class QueryDict(object):
         return self.dict().keys()
 
     def values(self):
-        return self.dict().values()
-
-    def list(self):
-        return self.params
+        return [ v for k,v in self.params ]
 
     def dict(self):
         d = {}
@@ -144,17 +180,6 @@ class QueryDict(object):
             if param[0] not in d:
                 d[param[0]] = param[1]
         return d
-
-    def update(self, *args, **kwargs):
-        if args:
-            if len(args) > 1:
-                raise TypeError("update expected at most 1 arguments, got %d" % len(args))
-
-            for k,v in args[0]:
-                self.params.append((k,v))
-
-        for key in kwargs:
-            self.params.append((key, kwargs[key]))
 
     def get(self, key, default=None):
         try:
@@ -164,3 +189,8 @@ class QueryDict(object):
 
     def get_all(self, key):
         return [ param[1] for param in self.params if param[0] == key ]
+
+    def __str__(self):
+        quoted_params = [ (urllib.quote(k), urllib.quote(v)) for k,v in self.params ]
+        joined_pairs  = [ '='.join(kvpair) for kvpair in quoted_params ]
+        return '&'.join(joined_pairs)

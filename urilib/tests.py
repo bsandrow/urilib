@@ -116,14 +116,81 @@ class TestHierPartProcessing(unittest.TestCase):
 class TestQueryDict(unittest.TestCase):
     """Test out the QueryDict class interface"""
 
-    def testQueryStringIsParsedCorrectly(self):
-        d = urilib.QueryDict("key1=val1&key2=val2")
+    def testStringify(self):
+        d = urilib.QueryDict('key1=value1&key2=value2&key1=value3')
+        assert str(d) == 'key1=value1&key2=value2&key1=value3'
 
-        assert 'key1' in d
-        assert 'key2' in d
+        d.append(('key4=value6'))
+        assert str(d) == 'key1=value1&key2=value2&key1=value3&key4=value6'
 
-        assert d['key1'] == 'val1'
-        assert d['key2'] == 'val2'
+        d.append(('key%206=value7'))
+        assert str(d) == 'key1=value1&key2=value2&key1=value3&key4=value6&key%206=value7'
+
+        del d['key1']
+        assert str(d) == 'key2=value2&key4=value6&key%206=value7'
+
+    def testListFunctionality(self):
+        d = urilib.QueryDict('key1=value1&key2=value2&key1=value3')
+        assert d.list() == [ ('key1','value1'), ('key2','value2'), ('key1','value3') ]
+
+    def testAppendFunctionality(self):
+        """Assert QueryDict.append() works correctly"""
+        d = urilib.QueryDict("key1=value1")
+        assert d.list() == [ ('key1','value1') ]
+
+        # Append via query string
+        d.append("key2=value2&key3=value3")
+        assert d.list() == [
+            ('key1','value1'),
+            ('key2','value2'),
+            ('key3','value3'),
+        ]
+
+        # Append via list of tuples
+        d.append([ ('key4','value4'), ('key6','value8') ])
+        assert d.list() == [
+            ('key1','value1'),
+            ('key2','value2'),
+            ('key3','value3'),
+            ('key4','value4'),
+            ('key6','value8'),
+        ]
+
+        # Append via keyword args
+        d.append(key5="value3")
+        assert d.list() == [
+            ('key1','value1'),
+            ('key2','value2'),
+            ('key3','value3'),
+            ('key4','value4'),
+            ('key6','value8'),
+            ('key5','value3'),
+        ]
+
+    def testDeleteFunctionality(self):
+        """Testing 'del d[]' functionality"""
+        d = urilib.QueryDict('key1=value1&key2=value2&key1=value3')
+
+        assert d.list() == [ ('key1','value1'), ('key2','value2'), ('key1','value3') ]
+
+        del d['key1']
+
+        assert d.list() == [ ('key2','value2') ]
+
+    def testBracketAccess(self):
+        d = urilib.QueryDict('key1=value1&key2=value2&key1=value3')
+
+        # Multi-value keys, return only the first value
+        assert d['key1'] == 'value1'
+
+        # KeyError thrown on non-existent key
+        keyerror_was_thrown = False
+        try:
+            d['key3']
+        except KeyError:
+            keyerror_was_thrown = True
+
+        assert keyerror_was_thrown
 
     def testKeysAndValuesAreUnquoted(self):
         """Assert that the query keys and values are URL decoded."""
@@ -136,12 +203,8 @@ class TestQueryDict(unittest.TestCase):
         assert d['key 1'] == 'Value 1'
         assert d['key 2'] == 'Value 3'
 
-    def testSquareBracketsReturnCorrectValue(self):
-        d = urilib.QueryDict("key=value1&key=value2")
-        assert d['key'] == 'value1'
-
     def testInitializesMultiValuedKeysCorrectly(self):
-        d = urilib.QueryDict("key1=value1&key1=value2&key2=value3")
+        d = urilib.QueryDict("key=1&key=2")
         assert 'key' in d
         assert d.get_all('key')[0] == "1"
         assert d.get_all('key')[1] == "2"
@@ -151,3 +214,27 @@ class TestQueryDict(unittest.TestCase):
         assert 'key' in d
         assert d.get_all('key')[0] == "1"
         assert d.get_all('key')[1] == "2"
+
+    def testKeys(self):
+        """Assert keys() method"""
+        d = urilib.QueryDict('key1=value1&key2=value2&key1=value3')
+        assert d.keys() == ['key2', 'key1']
+
+    def testValues(self):
+        d = urilib.QueryDict('key1=value1&key2=value2&key1=value3')
+        assert d.values() == ['value1','value2','value3']
+
+    def testDict(self):
+        d = urilib.QueryDict('key1=value1&key2=value2&key1=value3')
+        assert d.dict() == { 'key1': 'value1', 'key2': 'value2' }
+
+    def testGet(self):
+        d = urilib.QueryDict('key1=value1&key2=value2&key1=value3')
+        assert d.get('key1', None) == 'value1'
+        assert d.get('key1', 'value2') == 'value1'
+        assert d.get('key1') == 'value1'
+        assert d.get('key3', None) is None
+        assert d.get('key3', 'value5') == 'value5'
+
+    def testGetAll(self):
+        pass
