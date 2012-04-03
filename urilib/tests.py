@@ -129,6 +129,11 @@ class TestQueryDict(unittest.TestCase):
         del d['key1']
         assert str(d) == 'key2=value2&key4=value6&key%206=value7'
 
+    def testInOperator(self):
+        d = urilib.QueryDict('key1=value1&key2=value2')
+        assert 'key1' in d
+        assert 'key2' in d
+
     def testListFunctionality(self):
         d = urilib.QueryDict('key1=value1&key2=value2&key1=value3')
         assert d.list() == [ ('key1','value1'), ('key2','value2'), ('key1','value3') ]
