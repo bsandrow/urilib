@@ -10,9 +10,9 @@ decomposing them, editing them, recomposing them. With this library I hope to
 fix that.
 
 Basic URIs can be broken down into 5 basic components: scheme, authority, path,
-query, fragment. The URI parsing is kept to basics, with specific parsing for
-handling URI schemes that need special handling to make them work right (i.e.
-multiple params are implemented as name.1, name.2, etc. in magnet URIs).
+query, and fragment. The URI parsing is kept to basics, with specific parsing
+for handling URI schemes that need special handling to make them work right
+(i.e. multiple params are implemented as name.1, name.2, etc. in magnet URIs).
 
 Usage
 -----
