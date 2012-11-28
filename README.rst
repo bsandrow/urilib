@@ -86,3 +86,4 @@ Sources of Inspiration
 
  * Django's QueryDict - https://docs.djangoproject.com/en/dev/ref/request-response/#querydict-objects
  * Python Requests - https://github.com/kennethreitz/requests
+ * Perl's URI - https://github.com/libwww-perl/uri
