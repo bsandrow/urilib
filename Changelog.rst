@@ -6,6 +6,7 @@ Version 0.1 (2012-11-26)
  * Refactor!
  * Starting with a reasonably verbose README to guide the way.
  * Adding LICENSE and setup.py
+ * Adding MANIFEST.in
 
 Pre-History
 -----------
