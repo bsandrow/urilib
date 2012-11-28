@@ -6,7 +6,7 @@ except ImportError:
     from distutils.core import setup
 
 requires = []
-long_description = open('README.rst').read() + "\n\n" + open("Changelog").read()
+long_description = open('README.rst').read() + "\n\n" + open("Changelog.rst").read()
 
 config = {
     'name'            : 'urilib',
