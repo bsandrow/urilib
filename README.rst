@@ -30,7 +30,7 @@ Composing a URL: ::
     >>> str(uri)
     'https://www.google.com:443/?q=urilib&sourceid=chrome&ie=UTF-8'
 
-Decomposing an URL: ::
+Decomposing a URL: ::
 
     >>> import urilib
     >>> uri = urilib.uri('http://www.google.ca/search?sourceid=chrome&client=ubuntu&channel=cs&ie=UTF-8&q=urilib')
@@ -49,9 +49,11 @@ Adding a query parameter to a URL: ::
 
     >>> import urilib
     >>> uri = urilib.uri('http://www.example.com?q=urilib')
-    >>> uri.query['q'].append('urlparse')
+    >>> uri.query.update({'q': 'urlparse'}}
     >>> str(uri)
-    'http://www.example.com?q=urilib&q=urlparse'
+    'http://www.example.com/?q=urilib&q=urlparse'
+    >>> uri.query.appendlist('q', ['Bob', 'Nancy'])
+    'http://www.example.com/?q=urilib&q=urlparse&q=Bob&q=Nancy'
 
 Accessing query parameters: ::
 
@@ -60,6 +62,8 @@ Accessing query parameters: ::
     >>> uri.query['lang']
     'en'
     >>> uri.query['q']
+    'urlparse'
+    >>> uri.query.getlist('q')
     ['urilib', 'urlparse']
 
 Dealing with URI encoding: ::
@@ -77,3 +81,8 @@ Credits
 
 Copyright 2012 (c) Brandon Sandrowicz <brandon@sandrowicz.org>
 
+Sources of Inspiration
+----------------------
+
+ * Django's QueryDict - https://docs.djangoproject.com/en/dev/ref/request-response/#querydict-objects
+ * Python Requests - https://github.com/kennethreitz/requests
