@@ -26,9 +26,10 @@ class URI(object):
             self.scheme, unparsed = parts[::2]
 
         parts = unparsed.partition('#')
-        if parts[2] is not None:
-            unparsed, self.fragment = parts[::2]
+        unparsed, self.fragment = parts[::2]
 
+        parts = unparsed.partition('?')
+        unparsed, self.query = parts[::2]
 
     def __repr__(self):
         return "<URI(%s)>" % str(self)

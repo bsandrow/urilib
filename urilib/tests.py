@@ -43,3 +43,16 @@ class FragmentParsing(unittest.TestCase):
     def test_fragment_double_hash(self):
         uri = URI('http://example.com?var1=value&var2=Value2#me-and-my-#fragment')
         assert uri.fragment == 'me-and-my-#fragment'
+
+class QueryParsing(unittest.TestCase):
+    def test_query(self):
+        uri = URI('http://example.com?q=how+do+i+program+my+vcr')
+        assert str(uri.query) == 'q=how+do+i+program+my+vcr'
+
+    def test_query_qmark_in_query(self):
+        uri = URI('http://example.com?q=how+do+i+program+my+vcr?')
+        assert str(uri.query) == 'q=how+do+i+program+my+vcr?'
+
+    def test_query_qmark_in_fragment(self):
+        uri = URI('http://example.com?q=how+do+i+program+my+vcr?#why-do-i-care?')
+        assert str(uri.query) == 'q=how+do+i+program+my+vcr?'
