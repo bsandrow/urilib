@@ -81,6 +81,7 @@ Todo
  - URI normalization (e.g. eXAMPLE://hostname == example://hostname)
  - (optional) Removal of dot-segments (e.g. http://example.com/a/../ == http://example.com/a/)
  - (maybe) pluggable parsing backends
+ - Base URI / Relative URI handling
 
 Credits
 -------
