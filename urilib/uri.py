@@ -1,11 +1,6 @@
 import re
 
-scheme_re = re.compile(r'[^\W0-9_]([^\W_]|[+.-])*')
-
-def scheme_is_valid(scheme):
-    """ Return True/False result of SCHEME validation. """
-    m = scheme_re.match(scheme)
-    return m is not None
+import urilib.parsing
 
 class URI(object):
     scheme = None
@@ -16,32 +11,18 @@ class URI(object):
 
     def __init__(self, uri):
         self.original = uri
-        self.parse()
+        self._parse()
 
-    def parse(self):
-        unparsed = self.original
+    def _parse(self):
+        uri = self.original
 
-        parts = unparsed.partition(':')
-        if parts[2] is not None and scheme_is_valid(parts[0]):
-            self.scheme, unparsed = parts[::2]
+        uri_parts = urilib.parsing.parse_uri(uri)
 
-        parts = unparsed.partition('#')
-        unparsed, self.fragment = parts[::2]
-
-        parts = unparsed.partition('?')
-        if parts[1]:
-            unparsed, self.query = parts[::2]
-
-        if unparsed.startswith('//'):
-            unparsed = unparsed[2:]
-            parts = unparsed.partition('/')
-            if parts[2] is not None:
-                self.authority = parts[0]
-                self.path = ''.join(parts[1:])
-            else:
-                self.path = parts[0]
-        else:
-            self.path = unparsed
+        self.scheme = uri_parts.scheme
+        self.authority = uri_parts.authority
+        self.path = uri_parts.path
+        self.query = uri_parts.query
+        self.fragment = uri_parts.fragment
 
     def __repr__(self):
         return "<URI(%s)>" % str(self)
