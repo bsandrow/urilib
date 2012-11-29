@@ -10,7 +10,7 @@ long_description = open('README.rst').read() + "\n\n" + open("Changelog.rst").re
 
 config = {
     'name'            : 'urilib',
-    'description'     : 'Working with URIs should be easy.'
+    'description'     : 'Working with URIs should be easy.',
     'long_description': long_description,
     'author'          : 'Brandon Sandrowicz',
     'author_email'    : 'brandon@sandrowicz.org',
@@ -20,7 +20,7 @@ config = {
     'package_data'    : { '': ['LICENSE'] },
     'install_requires': requires,
     'license'         : open('LICENSE').read(),
-    'test_suite'      : 'tests',
+    'test_suite'      : 'urilib.tests',
     'classifiers'     : (
         'Developerment Status :: 1 - Planning',
         'Intended Audience :: Developers',
