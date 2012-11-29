@@ -76,6 +76,12 @@ Dealing with URI encoding: ::
     >>> str(uri.query)
     'q=urilib%20urlparse%20extra%20data&lang=en'
 
+Todo
+----
+ - URI normalization (e.g. eXAMPLE://hostname == example://hostname)
+ - (optional) Removal of dot-segments (e.g. http://example.com/a/../ == http://example.com/a/)
+ - (maybe) pluggable parsing backends
+
 Credits
 -------
 
