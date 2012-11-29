@@ -56,3 +56,20 @@ class QueryParsing(unittest.TestCase):
     def test_query_qmark_in_fragment(self):
         uri = URI('http://example.com?q=how+do+i+program+my+vcr?#why-do-i-care?')
         assert str(uri.query) == 'q=how+do+i+program+my+vcr?'
+
+    def test_query_no_query(self):
+        uri = URI('http://example.com/#Fragment')
+        self.assertEquals(uri.query, None)
+
+    def test_query_empty_query(self):
+        uri = URI('http://example.com/?#Fragment')
+        self.assertEquals(uri.query, '')
+
+class FullUriParsing(unittest.TestCase):
+    def test_full_uri_rfc_example(self):
+        uri = URI('http://www.ics.uci.edu/pub/ietf/uri/#Related')
+        assert uri.scheme == 'http'
+        assert uri.authority == 'www.ics.uci.edu'
+        self.assertEquals(uri.path, '/pub/ietf/uri/')
+        assert uri.fragment == 'Related'
+        self.assertEquals(uri.query, None)

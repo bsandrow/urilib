@@ -29,7 +29,19 @@ class URI(object):
         unparsed, self.fragment = parts[::2]
 
         parts = unparsed.partition('?')
-        unparsed, self.query = parts[::2]
+        if parts[1]:
+            unparsed, self.query = parts[::2]
+
+        if unparsed.startswith('//'):
+            unparsed = unparsed[2:]
+            parts = unparsed.partition('/')
+            if parts[2] is not None:
+                self.authority = parts[0]
+                self.path = ''.join(parts[1:])
+            else:
+                self.path = parts[0]
+        else:
+            self.path = unparsed
 
     def __repr__(self):
         return "<URI(%s)>" % str(self)
