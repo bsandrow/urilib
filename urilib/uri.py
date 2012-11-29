@@ -1,5 +1,3 @@
-import re
-
 import urilib.parsing
 
 class URI(object):
@@ -18,23 +16,28 @@ class URI(object):
 
         uri_parts = urilib.parsing.parse_uri(uri)
 
-        self.scheme = uri_parts.scheme
-        self.authority = uri_parts.authority
-        self.path = uri_parts.path
-        self.query = uri_parts.query
-        self.fragment = uri_parts.fragment
+        self.scheme, self.path, self.fragment = uri_parts[::2]
+        self.authority, self.query = uri_parts[1::2]
 
     def __repr__(self):
         return "<URI(%s)>" % str(self)
 
     def __str__(self):
-        uri = self.scheme
-        if self.authority:
-            uri += "://" + self.authority
-        if self.path:
-            uri += "/" + self.path
-        if self.query:
-            uri += '?' + str(self.query)
-        if self.fragment:
+        uri = ""
+
+        if self.scheme:
+            uri += self.scheme + ":"
+
+        if self.authority is not None:
+            uri += "//" + authority
+
+        if self.path is not None:
+            uri += self.path
+
+        if self.query is not None:
+            uri += "?" + str(self.query)
+
+        if self.fragment is not None:
             uri += "#" + self.fragment
+
         return uri
