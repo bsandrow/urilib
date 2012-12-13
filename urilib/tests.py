@@ -1,7 +1,6 @@
 import unittest
 
-from urilib.uri import URI
-from urilib.query import QueryDict
+from urilib import QueryDict, URI
 
 class UriParsing(unittest.TestCase):
     def test_scheme_abs_url_with_port(self):

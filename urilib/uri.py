@@ -1,5 +1,5 @@
-from urilib.query import QueryDict
-import urilib.parsing
+from .query   import QueryDict
+from .parsing import parse_uri
 
 class URI(object):
     scheme = None
@@ -15,7 +15,7 @@ class URI(object):
     def _parse(self):
         uri = self.original
 
-        uri_parts = urilib.parsing.parse_uri(uri)
+        uri_parts = parse_uri(uri)
 
         self.scheme, self.path, self.fragment = uri_parts[::2]
         self.authority, self.query = uri_parts[1::2]
