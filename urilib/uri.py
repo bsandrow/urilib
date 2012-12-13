@@ -1,3 +1,4 @@
+from urilib.query import QueryDict
 import urilib.parsing
 
 class URI(object):
@@ -19,8 +20,22 @@ class URI(object):
         self.scheme, self.path, self.fragment = uri_parts[::2]
         self.authority, self.query = uri_parts[1::2]
 
+        # if the query is None, then there wasn't *any* query component in the
+        # uri, so we want to leave the query as None to preserve this, or else
+        # we will get:
+        #
+        #   http://example.com/?#Chapter-1
+        #
+        # instead of:
+        #
+        #   http://example.com/#Chapter-1
+        #
+        # Technically, they are equivalent, but some people might care.
+        if self.query is not None:
+            self.query = QueryDict(self.query or '')
+
     def __repr__(self):
-        return "<URI(%s)>" % str(self)
+        return "URI('%s')" % str(self)
 
     def __str__(self):
         uri = ""
