@@ -56,7 +56,7 @@ class QueryParseError(Exception):
 class QueryDict(dict):
     """ QueryDict - """
 
-    safe_chars = ':@!$&\'()*,;=~-._'
+    safe_chars = ':@!$&\'()*,;=~-._?/'
 
     def __init__(self, query_string, plus_is_space=False, separator='&'):
         dict.__init__(self)

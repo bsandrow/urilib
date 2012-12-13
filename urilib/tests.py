@@ -219,7 +219,7 @@ class QueryDictTesting(unittest.TestCase):
         """ Assert that some unsafe characters are correctly encoded """
         q = QueryDict('')
 
-        for char in "/?#[]":
+        for char in "#[]":
             expected = "%%%X" % ord(char)
             self.assertEquals(q.url_quote(char), expected)
 
