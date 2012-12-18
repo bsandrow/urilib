@@ -146,6 +146,10 @@ class QueryDict(dict):
 
         return self.getlist(key)
 
+    def iterkeys(self):
+        for key in self.keys():
+            yield key
+
     def items(self):
         """\
         Return a list of key-value tuples using the __getitem__() logic to
@@ -237,11 +241,11 @@ class QueryDict(dict):
         is_kwargs_call= len(args) < 1 and len(kwargs.keys())
 
         if is_dict_call and not (is_tuple_call or is_kwargs_call):
-            iterable = args[0].iteritems()
+            iterable = args[0].items()
         elif is_tuple_call and not (is_dict_call or is_kwargs_call):
             iterable = args[0]
         elif is_kwargs_call and not (is_tuple_call or is_dict_call):
-            iterable = kwargs.iteritems()
+            iterable = kwargs.items()
         else:
             raise TypeError("%s.update() takes a dict, a list of 2-tuples, or keyword args" % self.__class__.__name__)
 
