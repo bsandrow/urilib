@@ -53,7 +53,7 @@ try:
     from urllib import quote as ul_quote
     from urllib import quote_plus as ul_quote_plus
 except ImportError:
-    from urllib.parse import unquote as ul_unquote,
+    from urllib.parse import unquote as ul_unquote
     from urllib.parse import unquote_plus as ul_unquote_plus
     from urllib.parse import quote as ul_quote
     from urllib.parse import quote_plus as ul_quote_plus
