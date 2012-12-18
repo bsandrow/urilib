@@ -1,8 +1,9 @@
+from __future__ import print_function
 
 try:
     from setuptools import setup
 except ImportError:
-    print "Falling back to distutils. Functionality may be limited."
+    print("Falling back to distutils. Functionality may be limited.")
     from distutils.core import setup
 
 requires = []
