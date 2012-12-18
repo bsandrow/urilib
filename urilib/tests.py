@@ -251,7 +251,7 @@ class QueryDictTesting(unittest.TestCase):
         # comparison
         self.assertEquals(
             set(q.items()),
-            { ('a', '23'), ('b', '23'), ('c', '3'), ('d', '4') },
+            set([ ('a', '23'), ('b', '23'), ('c', '3'), ('d', '4') ]),
         )
 
     def test_querydict_iteritems(self):
@@ -266,7 +266,7 @@ class QueryDictTesting(unittest.TestCase):
 
         self.assertEquals(
             set( q.iteritems() ),
-            { ('a', '23'), ('b', '23'), ('c', '3'), ('d', '4') },
+            set([ ('a', '23'), ('b', '23'), ('c', '3'), ('d', '4') ]),
         )
 
     def test_querydict_values(self):
