@@ -46,7 +46,17 @@ POSIX_ME_HARDER, but Stallman was desuaded ). ;-)
 # and now, the code...
 
 import copy
-import urllib
+
+try:
+    from urllib import unquote as ul_unquote
+    from urllib import unquote_plus as ul_unquote_plus
+    from urllib import quote as ul_quote
+    from urllib import quote_plus as ul_quote_plus
+except ImportError:
+    from urllib.parse import unquote as ul_unquote,
+    from urllib.parse import unquote_plus as ul_unquote_plus
+    from urllib.parse import quote as ul_quote
+    from urllib.parse import quote_plus as ul_quote_plus
 
 # XXX urlencode() ??
 
@@ -86,11 +96,11 @@ class QueryDict(dict):
         self.plus_is_space to determine if pluses should be spaces or not (as
         per HTML form data).
         """
-        quote  = urllib.quote
+        quote  = ul_quote
         kwargs = { 'safe': self.safe_chars + '+' }
 
         if self.plus_is_space:
-            quote = urllib.quote_plus
+            quote = ul_quote_plus
             kwargs['safe'] = self.safe_chars
 
         return quote(string, **kwargs)
@@ -103,10 +113,10 @@ class QueryDict(dict):
         into their character values.  Uses self.plus_is_space to determine if
         pluses should be spaces or not (as per HTML form data).
         """
-        unquote = urllib.unquote
+        unquote = ul_unquote
 
         if self.plus_is_space:
-            unquote = urllib.unquote_plus
+            unquote = ul_unquote_plus
 
         return unquote(string)
 
