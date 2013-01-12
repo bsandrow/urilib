@@ -2,15 +2,17 @@ from .query   import QueryDict
 from .parsing import parse_uri
 
 class URI(object):
+    original = None
     scheme = None
     authority = None
     path = None
     query = None
     fragment = None
 
-    def __init__(self, uri):
-        self.original = uri
-        self._parse()
+    def __init__(self, uri=None):
+        if uri:
+            self.original = uri
+            self._parse()
 
     def _parse(self):
         uri = self.original

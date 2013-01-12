@@ -4,6 +4,11 @@ import unittest
 
 from urilib import URI
 
+class UriConstruction(unittest.TestCase):
+    def test_initialize_empty_uri(self):
+        uri = URI()
+        self.assertEquals( str(uri), '' )
+
 class UriParsing(unittest.TestCase):
     def test_scheme_abs_url_with_port(self):
         uri = URI('http://example.com:80')
