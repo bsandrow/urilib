@@ -43,7 +43,7 @@ Decomposing a URL: ::
     >>> uri.fragment
     ''
     >>> str(uri.query)
-    '?sourceid=chrome&client=ubuntu&channel=cs&ie=UTF-8&q=urilib'
+    'sourceid=chrome&q=urilib&client=ubuntu&ie=UTF-8&channel=cs'
 
 Adding a query parameter to a URL: ::
 
