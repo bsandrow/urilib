@@ -23,7 +23,6 @@ class ConstructingAUri(unittest.TestCase):
 
         self.assertEqual( str(uri), 'https://www.google.com:443/?q=urilib&sourceid=chrome&ie=UTF-8' )
 
-
 class Deconstruction(unittest.TestCase):
     def test(self):
         uri = urilib.uri('http://www.google.ca/search?sourceid=chrome&client=ubuntu&channel=cs&ie=UTF-8&q=urilib')
@@ -33,3 +32,14 @@ class Deconstruction(unittest.TestCase):
         self.assertEquals(uri.path, '/search')
         self.assertEquals(uri.fragment, '')
         self.assertEquals(str(uri.query), 'sourceid=chrome&q=urilib&client=ubuntu&ie=UTF-8&channel=cs')
+
+class AddQueryParam(unittest.TestCase):
+    def test(self):
+        uri = urilib.uri('http://www.example.com/?q=urilib')
+
+        uri.query.update({'q': 'urlparse'})
+        self.assertEquals(str(uri), 'http://www.example.com/?q=urilib&q=urlparse')
+
+        uri.query['q'] = 'Bob'
+        uri.query['q'] = 'Nancy'
+        self.assertEquals(str(uri), 'http://www.example.com/?q=urilib&q=urlparse&q=Bob&q=Nancy')

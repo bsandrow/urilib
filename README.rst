@@ -48,11 +48,13 @@ Decomposing a URL: ::
 Adding a query parameter to a URL: ::
 
     >>> import urilib
-    >>> uri = urilib.uri('http://www.example.com?q=urilib')
-    >>> uri.query.update({'q': 'urlparse'}}
+    >>> uri = urilib.uri('http://www.example.com/?q=urilib')
+    >>> uri.query.update({'q': 'urlparse'})
     >>> str(uri)
     'http://www.example.com/?q=urilib&q=urlparse'
-    >>> uri.query.appendlist('q', ['Bob', 'Nancy'])
+    >>> uri.query['q'] = 'Bob'
+    >>> uri.query['q'] = 'Nancy'
+    >>> str(uri)
     'http://www.example.com/?q=urilib&q=urlparse&q=Bob&q=Nancy'
 
 Accessing query parameters: ::

@@ -43,7 +43,7 @@ class URI(object):
         if str(self.query):
             uri += "?" + str(self.query)
 
-        if self.fragment is not None:
+        if self.fragment:
             uri += "#" + self.fragment
 
         return uri
