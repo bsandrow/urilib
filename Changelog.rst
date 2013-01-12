@@ -1,8 +1,5 @@
-ChangeLog
-=========
-
-Version 0.1 (2012-11-26)
-------------------------
+Version v0.3
+------------
  * Refactor!
  * Starting with a reasonably verbose README to guide the way.
  * Adding LICENSE and setup.py
@@ -10,4 +7,4 @@ Version 0.1 (2012-11-26)
 
 Pre-History
 -----------
- * Writing a bunch of code and getting caught up in the details.
+ * Stuff happened. We don't talk about it much. ;-)

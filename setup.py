@@ -1,5 +1,7 @@
 from __future__ import print_function
 
+from urilib import __version__ as urilib_version
+
 try:
     from setuptools import setup
 except ImportError:
@@ -16,7 +18,7 @@ config = {
     'author'          : 'Brandon Sandrowicz',
     'author_email'    : 'brandon@sandrowicz.org',
     'url'             : 'http://github.com/bsandrow/urilib',
-    'version'         : 0.1,
+    'version'         : '0.3',
     'packages'        : ['urilib'],
     'package_data'    : { '': ['LICENSE'] },
     'install_requires': requires,
@@ -32,5 +34,9 @@ config = {
         'Programming Language :: Python',
     ),
 }
+
+# I like having the version explicitly here, but let's make sure that we don't
+# get out of sync.
+assert config['version'] == urilib_version, "Version mis-match between urilib and setup.py"
 
 setup(**config)
