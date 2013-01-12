@@ -6,10 +6,12 @@ class URI(object):
     scheme = None
     authority = None
     path = None
-    query = QueryDict('')
+    query = None
     fragment = None
 
     def __init__(self, uri=None):
+        self.query = QueryDict('')
+
         if uri:
             self.original = uri
             self._parse()

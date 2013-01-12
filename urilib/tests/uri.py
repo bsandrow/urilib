@@ -64,7 +64,7 @@ class UriParsing(unittest.TestCase):
 
     def test_query_no_query(self):
         uri = URI('http://example.com/#Fragment')
-        self.assertEquals(uri.query, None)
+        self.assertEquals(str(uri.query), '')
 
     def test_query_empty_query(self):
         uri = URI('http://example.com/?#Fragment')
@@ -76,7 +76,7 @@ class UriParsing(unittest.TestCase):
         self.assertEquals(uri.authority, 'www.ics.uci.edu')
         self.assertEquals(uri.path, '/pub/ietf/uri/')
         self.assertEquals(uri.fragment, 'Related')
-        self.assertEquals(uri.query, None)
+        self.assertEquals(str(uri.query), '')
 
 __all__ = [ "UriParsing" ]
 
