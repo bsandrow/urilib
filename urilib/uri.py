@@ -46,7 +46,7 @@ class URI(object):
             uri += self.scheme + ":"
 
         if self.authority is not None:
-            uri += "//" + authority
+            uri += "//" + self.authority
 
         if self.path is not None:
             uri += self.path
