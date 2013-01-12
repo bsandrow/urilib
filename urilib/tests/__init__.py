@@ -2,6 +2,7 @@
 
 import unittest
 
+from urilib.tests.examples import *
 from urilib.tests.querydict import *
 from urilib.tests.uri import *
 

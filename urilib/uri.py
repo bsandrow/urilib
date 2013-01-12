@@ -6,7 +6,7 @@ class URI(object):
     scheme = None
     authority = None
     path = None
-    query = None
+    query = QueryDict('')
     fragment = None
 
     def __init__(self, uri=None):
@@ -21,20 +21,7 @@ class URI(object):
 
         self.scheme, self.path, self.fragment = uri_parts[::2]
         self.authority, self.query = uri_parts[1::2]
-
-        # if the query is None, then there wasn't *any* query component in the
-        # uri, so we want to leave the query as None to preserve this, or else
-        # we will get:
-        #
-        #   http://example.com/?#Chapter-1
-        #
-        # instead of:
-        #
-        #   http://example.com/#Chapter-1
-        #
-        # Technically, they are equivalent, but some people might care.
-        if self.query is not None:
-            self.query = QueryDict(self.query or '')
+        self.query = QueryDict(self.query or '')
 
     def __repr__(self):
         return "URI('%s')" % str(self)
@@ -51,7 +38,7 @@ class URI(object):
         if self.path is not None:
             uri += self.path
 
-        if self.query is not None:
+        if str(self.query):
             uri += "?" + str(self.query)
 
         if self.fragment is not None:
