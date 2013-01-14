@@ -43,3 +43,13 @@ class AddQueryParam(unittest.TestCase):
         uri.query['q'] = 'Bob'
         uri.query['q'] = 'Nancy'
         self.assertEquals(str(uri), 'http://www.example.com/?q=urilib&q=urlparse&q=Bob&q=Nancy')
+
+class AccessQueryParams(unittest.TestCase):
+    def test(self):
+        uri = urilib.uri('http://www.example.com/?q=urilib&q=urlparse&lang=en')
+
+        self.assertEquals(uri.query['lang'], 'en')
+        self.assertEquals(uri.query['q'], 'urlparse')
+        self.assertEquals(uri.query.getlist('q'), ['urilib', 'urlparse'])
+
+
