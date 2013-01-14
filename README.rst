@@ -74,9 +74,11 @@ Dealing with URI encoding: ::
     >>> uri = urilib.uri('http://www.example.com/?q=urilib%20urlparse&lang=en')
     >>> uri.query['q']
     'urilib urlparse'
-    >>> uri.query['q'] += ' extra data'
+    >>> uri.query['q'] = ' extra data'
     >>> str(uri.query)
-    'q=urilib%20urlparse%20extra%20data&lang=en'
+    'q=urilib%20urlparse&q=%20extra%20data&lang=en'
+    >>> uri.query.getlist('q')
+    ['urilib urlparse', ' extra data']
 
 Todo
 ----

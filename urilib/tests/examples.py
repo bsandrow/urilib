@@ -52,4 +52,13 @@ class AccessQueryParams(unittest.TestCase):
         self.assertEquals(uri.query['q'], 'urlparse')
         self.assertEquals(uri.query.getlist('q'), ['urilib', 'urlparse'])
 
+class UrlEncoding(unittest.TestCase):
+    def test(self):
+        uri = urilib.uri('http://www.example.com/?q=urilib%20urlparse&lang=en')
 
+        self.assertEquals(uri.query['q'], 'urilib urlparse')
+
+        uri.query['q'] = ' extra data'
+
+        self.assertEquals(str(uri.query), 'q=urilib%20urlparse&q=%20extra%20data&lang=en')
+        self.assertEquals(uri.query.getlist('q'), ['urilib urlparse', ' extra data'])
